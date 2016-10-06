@@ -1,3 +1,3 @@
 # SE460-Project
 
-This project exercises agile methods.
+This project exercises agile methodology.
