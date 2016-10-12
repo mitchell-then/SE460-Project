@@ -1,16 +1,15 @@
 import java.time.*;
 import org.jdom2.*;
 
-class course {
+public class course {
     private String name;
     private String department;
     private String number;
     private String section;
+    private String notes;
 
     private LocalTime start_time;
     private LocalTime end_time;
-
-    private String notes;
 
     course(String n, String d, String nu, String s, String st, String et) {
         name = n;
@@ -74,12 +73,12 @@ class course {
     // ------------------------------------
     public void debug_print() {
         System.out.println("Name: " + name);
-        System.out.println("  Department: " + department);
-        System.out.println("  Number:     " + number);
-        System.out.println("  Section:    " + section);
-        System.out.println("  Start Time: " + start_time.toString());
-        System.out.println("  End Time:   " + end_time.toString());
-        System.out.println("  Notes:      " + notes);
+        System.out.println("  Department: [" + department + "]");
+        System.out.println("  Number:     [" + number + "]");
+        System.out.println("  Section:    [" + section + "]");
+        System.out.println("  Start Time: [" + start_time.toString() + "]");
+        System.out.println("  End Time:   [" + end_time.toString() + "]");
+        System.out.println("  Notes:      [" + notes + "]");
     }
 
     // ------------------------------------
@@ -118,6 +117,4 @@ class course {
 
         return course_element;
     }
-
-
 }
