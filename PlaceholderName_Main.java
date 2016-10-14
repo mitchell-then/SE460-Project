@@ -5,30 +5,39 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.JDOMException;
+// import static swing_console.*;
+import javax.swing.*;
+
 
 
 class PlaceholderName_Main {
     private static String xml_file_name = "saved_data.xml";
+    private static List<course> course_list = new ArrayList<>();
+    public static Document xml_doc = null;
 
     public static void main(String[] args) {
-        List<course> course_list = new ArrayList<>();
+        // --------------------------------------------------------------------
+        // initial setup
+        // --------------------------------------------------------------------
         File xml_file = new File(xml_file_name);
         if (!xml_file.exists()) {
             generate_empty_xml();
         }
 
-        Document xml_doc = load_from_xml(course_list);
+        load_from_xml(course_list);
+        // --------------------------------------------------------------------
 
-        course test_course = new course("Some Fake Course Name", "SE", "999", "01", "10:00", "10:50");
-        course test_course_a = new course("Some Fake Course Name", "SE", "999", "01", "10:00", "10:50");
 
-        course_list.add(test_course);
-        course_list.add(test_course_a);
-
-        save_to_xml(xml_doc, course_list);
+        swing_console.run(new add_course_frame());
     }
 
-    private static void write_to_xml(Document xml_doc) {
+    public static void end_process() {
+        System.out.println("saving");
+        save_to_xml( course_list);
+        System.exit(0);
+    }
+
+    private static void write_to_xml() {
         File xml_file = new File(xml_file_name);
 
         XMLOutputter xml_out = new XMLOutputter();
@@ -41,7 +50,7 @@ class PlaceholderName_Main {
         }
     }
 
-    private static void save_to_xml(Document xml_doc, List<course> course_list) {
+    private static void save_to_xml(List<course> course_list) {
         // courses
         Element course_root = xml_doc.getRootElement().getChild("courses");
         for (int i = 0; i < course_list.size(); i++) {
@@ -50,13 +59,12 @@ class PlaceholderName_Main {
 
         // TODO: add saving for other objects
 
-        write_to_xml(xml_doc);
+        write_to_xml();
     }
 
-    private static Document load_from_xml(List<course> course_list) {
+    private static void load_from_xml(List<course> course_list) {
         File xml_file = new File(xml_file_name);
         SAXBuilder sax_builder = new SAXBuilder();
-        Document xml_doc = null;
 
         try {
             xml_doc = sax_builder.build(xml_file);
@@ -76,13 +84,11 @@ class PlaceholderName_Main {
             ioe.printStackTrace();
         }
 
-        return xml_doc;
-
     }
 
     private static void generate_empty_xml() {
         Element xml_root = new Element("PlaceholderName");
-        Document xml_doc = new Document(xml_root);
+        xml_doc = new Document(xml_root);
 
         Element courses = new Element("courses");
         xml_doc.getRootElement().addContent(courses);
@@ -92,7 +98,7 @@ class PlaceholderName_Main {
 
         // TODO: add generation for other objects
 
-        write_to_xml(xml_doc);
+        write_to_xml();
     }
 
     private static course xml_to_course(Element course_element) {
@@ -108,5 +114,9 @@ class PlaceholderName_Main {
         temp.set_notes(temp_notes);
 
         return temp;
+    }
+
+    public static void add_course_to_list(course c) {
+        course_list.add(c);
     }
 }
