@@ -51,6 +51,12 @@ class PlaceholderName_Main {
     }
 
     private static void save_to_xml(List<course> course_list) {
+        File xml_file = new File(xml_file_name);
+
+        xml_file.delete();
+
+        generate_empty_xml();
+
         // courses
         Element course_root = xml_doc.getRootElement().getChild("courses");
         for (int i = 0; i < course_list.size(); i++) {
