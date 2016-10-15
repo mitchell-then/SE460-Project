@@ -31,8 +31,8 @@ class course_panel extends JPanel {
     // ----------------------
     // list
     // ----------------------
-    public static DefaultListModel list_model = new DefaultListModel();
-    private static JList course_list;
+    public static DefaultListModel<String> list_model = new DefaultListModel<>();
+    private static JList<String> course_list;
     private list_selection_listener lsl = new list_selection_listener();
 
     // ----------------------
@@ -64,15 +64,16 @@ class course_panel extends JPanel {
         refresh_list();
 
         // list
-        course_list = new JList(list_model);
+        course_list = new JList<>(list_model);
         course_list.addListSelectionListener(lsl);
         course_list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         course_list.setLayoutOrientation(JList.VERTICAL);
         course_list.setVisibleRowCount(-1);
         JScrollPane list_scroller = new JScrollPane(course_list);
 
-        // // course info labels
+        // notes
         selected_course_notes.setEditable(false);
+        selected_course_notes.setBackground(new Color(238, 238, 238));
         JScrollPane notes_scroller = new JScrollPane(selected_course_notes);
         Border notes_scroller_border = BorderFactory.createTitledBorder("Notes");
         notes_scroller.setBorder(notes_scroller_border);
@@ -187,6 +188,8 @@ class course_panel extends JPanel {
                 selected_course_notes.setText(selected_course.get_notes());
                 selected_course_start_time.setText(selected_course.get_start_time().toString());
                 selected_course_end_time.setText(selected_course.get_end_time().toString());
+
+                selected_course_notes.setCaretPosition(0);
             }
             else {
                 selected_course_name.setText("");
@@ -250,7 +253,7 @@ class course_panel extends JPanel {
 
 class bill_panel extends JPanel {
     private DefaultListModel list_model;
-    private JList course_list;
+    private JList<DefaultListModel> bill_list;
     private JLabel temp = new JLabel("temp placeholder for bills pane");
     public bill_panel() {
         this.setLayout(new FlowLayout());
@@ -519,6 +522,7 @@ class add_course_notes_frame extends JFrame {
         input_notes.setLineWrap(true);
         input_notes.setWrapStyleWord(true);
         input_notes.setText(PlaceholderName_Main.get_course_at(index).get_notes());
+        input_notes.setCaretPosition(0);
         JScrollPane notes_scroller = new JScrollPane(input_notes);
         text_pane.add(notes_scroller);
 
