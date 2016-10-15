@@ -68,6 +68,8 @@ public class course {
 
     public String get_notes() { return notes; }
 
+    public String get_department_and_number() { return department + " " + number; }
+
     // ------------------------------------
     // debug
     // ------------------------------------

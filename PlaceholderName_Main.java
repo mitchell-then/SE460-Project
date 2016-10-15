@@ -28,7 +28,11 @@ class PlaceholderName_Main {
         // --------------------------------------------------------------------
 
 
-        swing_console.run(new add_course_frame());
+        JFrame main_gui = new gui();
+        swing_console.run(main_gui);
+
+        // gui.refresh();
+        // end_process();
     }
 
     public static void end_process() {
@@ -124,5 +128,21 @@ class PlaceholderName_Main {
 
     public static void add_course_to_list(course c) {
         course_list.add(c);
+    }
+
+    public static void remove_course_from_list(int index) {
+        course_list.remove(index);
+    }
+
+    public static int course_list_size() {
+        return course_list.size();
+    }
+
+    public static boolean is_empty() {
+        return course_list.isEmpty();
+    }
+
+    public static course get_course_at(int index) {
+        return course_list.get(index);
     }
 }
