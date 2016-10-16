@@ -84,6 +84,9 @@ class course_panel extends JPanel {
         remove_course_button.addActionListener(rcbl);
         edit_course_button.addActionListener(ecbl);
         add_course_notes_button.addActionListener(acnbl);
+        remove_course_button.setEnabled(false);
+        edit_course_button.setEnabled(false);
+        add_course_notes_button.setEnabled(false);
 
         // setup panel
         this.setLayout(new GridBagLayout());
@@ -197,6 +200,10 @@ class course_panel extends JPanel {
                 selected_course_end_time.setText(selected_course.get_end_time().toString());
                 selected_course_days_of_week.setText(selected_course.get_days_of_week());
 
+                remove_course_button.setEnabled(true);
+                edit_course_button.setEnabled(true);
+                add_course_notes_button.setEnabled(true);
+
                 selected_course_notes.setCaretPosition(0);
             }
             else {
@@ -208,6 +215,11 @@ class course_panel extends JPanel {
                 selected_course_start_time.setText("");
                 selected_course_end_time.setText("");
                 selected_course_days_of_week.setText("");
+
+                remove_course_button.setEnabled(false);
+                edit_course_button.setEnabled(false);
+                add_course_notes_button.setEnabled(false);
+
             }
         }
     }
@@ -224,7 +236,7 @@ class course_panel extends JPanel {
 
     class create_course_button_listener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            add_course_frame acf = new add_course_frame();
+            course_frame acf = new course_frame();
             acf.pack();
             acf.setVisible(true);
         }
@@ -272,89 +284,64 @@ class bill_panel extends JPanel {
     }
 }
 
-class add_course_frame extends JFrame {
+class course_frame extends JFrame {
     // ----------------------
     // input text fields
     // ----------------------
-    private JTextField name_field = new JTextField(10);
-    private JTextField department_field = new JTextField(10);
-    private JFormattedTextField number_field = new JFormattedTextField(create_formatter("###"));
-    private JFormattedTextField section_field = new JFormattedTextField(create_formatter("##"));
-    private JFormattedTextField start_time_field = new JFormattedTextField(create_formatter("##:##"));
-    private JFormattedTextField end_time_field = new JFormattedTextField(create_formatter("##:##"));
+    protected JTextField name_field = new JTextField();
+    protected JTextField department_field = new JTextField(4);
+    protected JFormattedTextField number_field = new JFormattedTextField(create_formatter("###"));
+    protected JFormattedTextField section_field = new JFormattedTextField(create_formatter("##"));
+    protected JFormattedTextField start_time_field = new JFormattedTextField(create_formatter("##:##"));
+    protected JFormattedTextField end_time_field = new JFormattedTextField(create_formatter("##:##"));
 
     // ----------------------
     // labels
     // ----------------------
-    private JLabel name_label = new JLabel("Name: ");
-    private JLabel department_label = new JLabel("Department: ");
-    private JLabel number_label = new JLabel("Number: ");
-    private JLabel section_label = new JLabel("Section: ");
-    private JLabel start_time_label = new JLabel("Start Time: ");
-    private JLabel end_time_label = new JLabel("End Time: ");
+    protected JLabel name_label = new JLabel("Name: ");
+    protected JLabel department_label = new JLabel("Department: ");
+    protected JLabel number_label = new JLabel("Number: ");
+    protected JLabel section_label = new JLabel("Section: ");
+    protected JLabel start_time_label = new JLabel("Start Time: ");
+    protected JLabel end_time_label = new JLabel("End Time: ");
 
     // ----------------------
     // checkboxes
     // ----------------------
-    private JCheckBox monday_checkbox = new JCheckBox("Monday");
-    private JCheckBox tuesday_checkbox = new JCheckBox("Tuesday");
-    private JCheckBox wednesday_checkbox = new JCheckBox("Wednesday");
-    private JCheckBox thursday_checkbox = new JCheckBox("Thursday");
-    private JCheckBox friday_checkbox = new JCheckBox("Friday");
+    protected JCheckBox monday_checkbox = new JCheckBox("Monday");
+    protected JCheckBox tuesday_checkbox = new JCheckBox("Tuesday");
+    protected JCheckBox wednesday_checkbox = new JCheckBox("Wednesday");
+    protected JCheckBox thursday_checkbox = new JCheckBox("Thursday");
+    protected JCheckBox friday_checkbox = new JCheckBox("Friday");
 
-    private boolean temp_course_monday = false;
-    private boolean temp_course_tuesday = false;
-    private boolean temp_course_wednesday = false;
-    private boolean temp_course_thursday = false;
-    private boolean temp_course_friday = false;
+    protected boolean temp_course_monday = false;
+    protected boolean temp_course_tuesday = false;
+    protected boolean temp_course_wednesday = false;
+    protected boolean temp_course_thursday = false;
+    protected boolean temp_course_friday = false;
 
-    private checkbox_listener all_checkbox_listener = new checkbox_listener();
+    protected checkbox_listener all_checkbox_listener = new checkbox_listener();
 
     // ----------------------
     // buttons
     // ----------------------
-    private JButton create_button = new JButton("Create");
-    private JButton cancel_button = new JButton("Cancel");
-    private create_button_listener cbl = new create_button_listener();
-    private cancel_button_listener cabl = new cancel_button_listener();
+    protected JButton done_button = new JButton("Done");
+    protected JButton cancel_button = new JButton("Cancel");
+    protected done_button_listener dbl = new done_button_listener();
+    protected cancel_button_listener cbl = new cancel_button_listener();
 
-    public add_course_frame() {
-        // overall frame panes
-        JPanel label_pane = new JPanel();
-        label_pane.setLayout(new GridLayout(6, 1, 6, 6));
-        label_pane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
-        JPanel input_pane = new JPanel();
-        input_pane.setLayout(new GridLayout(6, 1, 6, 6));
-        input_pane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+    public course_frame() {
+        JPanel frame_pane = new JPanel();
+        frame_pane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         JPanel checkbox_pane = new JPanel();
-        checkbox_pane.setLayout(new GridLayout(5, 1, 6, 6));
+        checkbox_pane.setLayout(new GridLayout(1, 5, 6, 6));
         checkbox_pane.setBorder(BorderFactory.createTitledBorder("Days of Class"));
-
-        JPanel button_pane = new JPanel();
-        button_pane.setLayout(new BoxLayout(button_pane, BoxLayout.LINE_AXIS));
-        button_pane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         // setup and add input text fields
         section_field.setFocusLostBehavior(JFormattedTextField.PERSIST);
         start_time_field.setFocusLostBehavior(JFormattedTextField.PERSIST);
         end_time_field.setFocusLostBehavior(JFormattedTextField.PERSIST);
-
-        input_pane.add(name_field);
-        input_pane.add(department_field);
-        input_pane.add(number_field);
-        input_pane.add(section_field);
-        input_pane.add(start_time_field);
-        input_pane.add(end_time_field);
-
-        // add labels
-        label_pane.add(name_label);
-        label_pane.add(department_label);
-        label_pane.add(number_label);
-        label_pane.add(section_label);
-        label_pane.add(start_time_label);
-        label_pane.add(end_time_label);
 
         // setup and add checkboxes
         monday_checkbox.addItemListener(all_checkbox_listener);
@@ -370,19 +357,101 @@ class add_course_frame extends JFrame {
         checkbox_pane.add(friday_checkbox);
 
         // setup and add buttons
-        create_button.addActionListener(cbl);
-        cancel_button.addActionListener(cabl);
-        button_pane.add(Box.createHorizontalGlue());
-        button_pane.add(cancel_button);
-        button_pane.add(Box.createRigidArea(new Dimension(10, 0)));
-        button_pane.add(create_button);
+        done_button.addActionListener(dbl);
+        cancel_button.addActionListener(cbl);
 
-        // setup frame
-        Container content_pane = getContentPane();
-        content_pane.add(label_pane, BorderLayout.LINE_START);
-        content_pane.add(input_pane, BorderLayout.CENTER);
-        content_pane.add(checkbox_pane, BorderLayout.LINE_END);
-        content_pane.add(button_pane, BorderLayout.PAGE_END);
+        // setup panel
+        frame_pane.setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
+
+        // add name
+        c.gridx = 0;
+        c.gridy = 0;
+        c.weightx = 0.5;
+        frame_pane.add(name_label, c);
+
+        c.gridx = 1;
+        c.gridy = 0;
+        c.gridwidth = 5;
+        c.weightx = 0.5;
+        frame_pane.add(name_field, c);
+
+        // add department
+        c.gridx = 0;
+        c.gridy = 1;
+        c.gridwidth = 1;
+        c.weightx = 0.5;
+        frame_pane.add(department_label, c);
+
+        c.gridx = 1;
+        c.gridy = 1;
+        c.weightx = 0.5;
+        frame_pane.add(department_field, c);
+
+        // add number
+        c.gridx = 2;
+        c.gridy = 1;
+        c.weightx = 0.5;
+        frame_pane.add(number_label, c);
+
+        c.gridx = 3;
+        c.gridy = 1;
+        c.weightx = 0.5;
+        frame_pane.add(number_field, c);
+
+        // add section
+        c.gridx = 4;
+        c.gridy = 1;
+        c.weightx = 0.5;
+        frame_pane.add(section_label, c);
+
+        c.gridx = 5;
+        c.gridy = 1;
+        c.weightx = 0.5;
+        frame_pane.add(section_field, c);
+
+        // add start_time
+        c.gridx = 0;
+        c.gridy = 2;
+        c.weightx = 0.5;
+        frame_pane.add(start_time_label, c);
+
+        c.gridx = 1;
+        c.gridy = 2;
+        c.weightx = 0.5;
+        frame_pane.add(start_time_field, c);
+
+        // add end_time
+        c.gridx = 2;
+        c.gridy = 2;
+        c.weightx = 0.5;
+        frame_pane.add(end_time_label, c);
+
+        c.gridx = 3;
+        c.gridy = 2;
+        c.weightx = 0.5;
+        frame_pane.add(end_time_field, c);
+
+        // add days_of_week
+        c.gridx = 0;
+        c.gridy = 3;
+        c.gridwidth = 6;
+        c.weightx = 0.5;
+        frame_pane.add(checkbox_pane, c);
+
+        // add buttons
+        c.gridx = 4;
+        c.gridy = 4;
+        c.gridwidth = 1;
+        c.weightx = 0.5;
+        frame_pane.add(cancel_button, c);
+
+        c.gridx = 5;
+        c.gridy = 4;
+        c.weightx = 0.5;
+        frame_pane.add(done_button, c);
+        this.add(frame_pane);
     }
 
     class checkbox_listener implements ItemListener {
@@ -407,13 +476,20 @@ class add_course_frame extends JFrame {
         }
     }
 
-    class create_button_listener implements ActionListener {
+    class done_button_listener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            course temp = new course(name_field.getText(), department_field.getText(), number_field.getText(), section_field.getText(), start_time_field.getText(), end_time_field.getText(), temp_course_monday, temp_course_tuesday, temp_course_wednesday, temp_course_thursday, temp_course_friday);
-            PlaceholderName_Main.add_course_to_list(temp);
-            course_panel.refresh_list();
-            setVisible(false);
-            dispose();
+            try {
+                course temp = new course(name_field.getText(), department_field.getText(), number_field.getText(), section_field.getText(), start_time_field.getText(), end_time_field.getText(), temp_course_monday, temp_course_tuesday, temp_course_wednesday, temp_course_thursday, temp_course_friday);
+                PlaceholderName_Main.add_course_to_list(temp);
+                course_panel.refresh_list();
+            }
+            catch (Exception ex) {
+                System.err.println("Invalid course data: " + ex);
+            }
+            finally {
+                setVisible(false);
+                dispose();
+            }
         }
     }
 
@@ -436,57 +512,13 @@ class add_course_frame extends JFrame {
     }
 }
 
-class edit_course_frame extends JFrame {
-    // ----------------------
-    // input text fields
-    // ----------------------
-    private JTextField name_field = new JTextField(10);
-    private JTextField department_field = new JTextField(10);
-    private JFormattedTextField number_field = new JFormattedTextField(create_formatter("###"));
-    private JFormattedTextField section_field = new JFormattedTextField(create_formatter("##"));
-    private JFormattedTextField start_time_field = new JFormattedTextField(create_formatter("##:##"));
-    private JFormattedTextField end_time_field = new JFormattedTextField(create_formatter("##:##"));
-
-    // ----------------------
-    // labels
-    // ----------------------
-    private JLabel name_label = new JLabel("Name: ");
-    private JLabel department_label = new JLabel("Department: ");
-    private JLabel number_label = new JLabel("Number: ");
-    private JLabel section_label = new JLabel("Section: ");
-    private JLabel start_time_label = new JLabel("Start Time: ");
-    private JLabel end_time_label = new JLabel("End Time: ");
-
-    // ----------------------
-    // buttons
-    // ----------------------
-    private JButton done_button = new JButton("Done");
-    private JButton cancel_button = new JButton("Cancel");
-    private done_button_listener dbl = new done_button_listener();
-    private cancel_button_listener cbl = new cancel_button_listener();
-
+class edit_course_frame extends course_frame {
     private int index;
-
     public edit_course_frame(int i) {
         index = i;
 
-        // overall frame panes
-        JPanel label_pane = new JPanel();
-        label_pane.setLayout(new GridLayout(6, 1, 6, 6));
-        label_pane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
-        JPanel input_pane = new JPanel();
-        input_pane.setLayout(new GridLayout(6, 1, 6, 6));
-        input_pane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
-        JPanel button_pane = new JPanel();
-        button_pane.setLayout(new BoxLayout(button_pane, BoxLayout.LINE_AXIS));
-        button_pane.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
-
-        // setup and add input text fields
-        section_field.setFocusLostBehavior(JFormattedTextField.PERSIST);
-        start_time_field.setFocusLostBehavior(JFormattedTextField.PERSIST);
-        end_time_field.setFocusLostBehavior(JFormattedTextField.PERSIST);
+        done_button.removeActionListener(dbl);
+        done_button.addActionListener(new done_button_listener());
 
         // populate fields with existing data
         name_field.setText(PlaceholderName_Main.get_course_at(index).get_name());
@@ -496,34 +528,11 @@ class edit_course_frame extends JFrame {
         start_time_field.setText(PlaceholderName_Main.get_course_at(index).get_start_time().toString());
         end_time_field.setText(PlaceholderName_Main.get_course_at(index).get_end_time().toString());
 
-        input_pane.add(name_field);
-        input_pane.add(department_field);
-        input_pane.add(number_field);
-        input_pane.add(section_field);
-        input_pane.add(start_time_field);
-        input_pane.add(end_time_field);
-
-        // add labels
-        label_pane.add(name_label);
-        label_pane.add(department_label);
-        label_pane.add(number_label);
-        label_pane.add(section_label);
-        label_pane.add(start_time_label);
-        label_pane.add(end_time_label);
-
-        // setup and add buttons
-        done_button.addActionListener(dbl);
-        cancel_button.addActionListener(cbl);
-        button_pane.add(Box.createHorizontalGlue());
-        button_pane.add(cancel_button);
-        button_pane.add(Box.createRigidArea(new Dimension(10, 0)));
-        button_pane.add(done_button);
-
-        // setup frame
-        Container content_pane = getContentPane();
-        content_pane.add(label_pane, BorderLayout.LINE_START);
-        content_pane.add(input_pane, BorderLayout.LINE_END);
-        content_pane.add(button_pane, BorderLayout.PAGE_END);
+        monday_checkbox.setSelected(PlaceholderName_Main.get_course_at(index).get_monday());
+        tuesday_checkbox.setSelected(PlaceholderName_Main.get_course_at(index).get_tuesday());
+        wednesday_checkbox.setSelected(PlaceholderName_Main.get_course_at(index).get_wednesday());
+        thursday_checkbox.setSelected(PlaceholderName_Main.get_course_at(index).get_thursday());
+        friday_checkbox.setSelected(PlaceholderName_Main.get_course_at(index).get_friday());
     }
 
     class done_button_listener implements ActionListener {
@@ -534,28 +543,15 @@ class edit_course_frame extends JFrame {
             PlaceholderName_Main.get_course_at(index).set_section(section_field.getText());
             PlaceholderName_Main.get_course_at(index).set_start_time(start_time_field.getText());
             PlaceholderName_Main.get_course_at(index).set_end_time(end_time_field.getText());
+            PlaceholderName_Main.get_course_at(index).set_monday(true ? monday_checkbox.isSelected() : false);
+            PlaceholderName_Main.get_course_at(index).set_tuesday(true ? tuesday_checkbox.isSelected() : false);
+            PlaceholderName_Main.get_course_at(index).set_wednesday(true ? wednesday_checkbox.isSelected() : false);
+            PlaceholderName_Main.get_course_at(index).set_thursday(true ? thursday_checkbox.isSelected() : false);
+            PlaceholderName_Main.get_course_at(index).set_friday(true ? friday_checkbox.isSelected() : false);
             course_panel.refresh_list(index);
             setVisible(false);
             dispose();
         }
-    }
-
-    class cancel_button_listener implements ActionListener {
-        public void actionPerformed(ActionEvent e) {
-            setVisible(false);
-            dispose();
-        }
-    }
-
-    protected MaskFormatter create_formatter(String s) {
-        MaskFormatter formatter = null;
-        try {
-            formatter = new MaskFormatter(s);
-        } catch (java.text.ParseException exc) {
-            System.err.println("formatter is bad: " + exc.getMessage());
-            System.exit(-1);
-        }
-        return formatter;
     }
 }
 

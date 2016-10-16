@@ -107,6 +107,18 @@ public class course {
         return out;
     }
 
+    public boolean get_monday() { return days_of_week[0]; }
+    public boolean get_tuesday() { return days_of_week[1]; }
+    public boolean get_wednesday() { return days_of_week[2]; }
+    public boolean get_thursday() { return days_of_week[3]; }
+    public boolean get_friday() { return days_of_week[4]; }
+
+    public void set_monday(boolean a) { days_of_week[0] = a; }
+    public void set_tuesday(boolean a) { days_of_week[1] = a; }
+    public void set_wednesday(boolean a) { days_of_week[2] = a; }
+    public void set_thursday(boolean a) { days_of_week[3] = a; }
+    public void set_friday(boolean a) { days_of_week[4] = a; }
+
     // ------------------------------------
     // debug
     // ------------------------------------
