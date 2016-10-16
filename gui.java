@@ -45,6 +45,7 @@ class course_panel extends JPanel {
     private JTextArea selected_course_notes = new JTextArea();
     private info_label selected_course_start_time = new info_label("Start Time");
     private info_label selected_course_end_time = new info_label("End Time");
+    private info_label selected_course_days_of_week = new info_label("Days of Week");
 
     // ----------------------
     // buttons
@@ -132,6 +133,11 @@ class course_panel extends JPanel {
         c.weightx = 0.5;
         this.add(selected_course_end_time, c);
 
+        c.gridx = 3;
+        c.gridy = 2;
+        c.weightx = 0.5;
+        this.add(selected_course_days_of_week, c);
+
         c.gridx = 1;
         c.gridy = 3;
         c.gridwidth = 3;
@@ -159,6 +165,7 @@ class course_panel extends JPanel {
         c.gridx = 3;
         c.gridy = 4;
         this.add(add_course_notes_button, c);
+        this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
     }
 
     public static void refresh_list() {
@@ -188,6 +195,7 @@ class course_panel extends JPanel {
                 selected_course_notes.setText(selected_course.get_notes());
                 selected_course_start_time.setText(selected_course.get_start_time().toString());
                 selected_course_end_time.setText(selected_course.get_end_time().toString());
+                selected_course_days_of_week.setText(selected_course.get_days_of_week());
 
                 selected_course_notes.setCaretPosition(0);
             }
@@ -199,6 +207,7 @@ class course_panel extends JPanel {
                 selected_course_notes.setText("");
                 selected_course_start_time.setText("");
                 selected_course_end_time.setText("");
+                selected_course_days_of_week.setText("");
             }
         }
     }
@@ -285,6 +294,23 @@ class add_course_frame extends JFrame {
     private JLabel end_time_label = new JLabel("End Time: ");
 
     // ----------------------
+    // checkboxes
+    // ----------------------
+    private JCheckBox monday_checkbox = new JCheckBox("Monday");
+    private JCheckBox tuesday_checkbox = new JCheckBox("Tuesday");
+    private JCheckBox wednesday_checkbox = new JCheckBox("Wednesday");
+    private JCheckBox thursday_checkbox = new JCheckBox("Thursday");
+    private JCheckBox friday_checkbox = new JCheckBox("Friday");
+
+    private boolean temp_course_monday = false;
+    private boolean temp_course_tuesday = false;
+    private boolean temp_course_wednesday = false;
+    private boolean temp_course_thursday = false;
+    private boolean temp_course_friday = false;
+
+    private checkbox_listener all_checkbox_listener = new checkbox_listener();
+
+    // ----------------------
     // buttons
     // ----------------------
     private JButton create_button = new JButton("Create");
@@ -302,9 +328,13 @@ class add_course_frame extends JFrame {
         input_pane.setLayout(new GridLayout(6, 1, 6, 6));
         input_pane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
+        JPanel checkbox_pane = new JPanel();
+        checkbox_pane.setLayout(new GridLayout(5, 1, 6, 6));
+        checkbox_pane.setBorder(BorderFactory.createTitledBorder("Days of Class"));
+
         JPanel button_pane = new JPanel();
         button_pane.setLayout(new BoxLayout(button_pane, BoxLayout.LINE_AXIS));
-        button_pane.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
+        button_pane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         // setup and add input text fields
         section_field.setFocusLostBehavior(JFormattedTextField.PERSIST);
@@ -326,6 +356,19 @@ class add_course_frame extends JFrame {
         label_pane.add(start_time_label);
         label_pane.add(end_time_label);
 
+        // setup and add checkboxes
+        monday_checkbox.addItemListener(all_checkbox_listener);
+        tuesday_checkbox.addItemListener(all_checkbox_listener);
+        wednesday_checkbox.addItemListener(all_checkbox_listener);
+        thursday_checkbox.addItemListener(all_checkbox_listener);
+        friday_checkbox.addItemListener(all_checkbox_listener);
+
+        checkbox_pane.add(monday_checkbox);
+        checkbox_pane.add(tuesday_checkbox);
+        checkbox_pane.add(wednesday_checkbox);
+        checkbox_pane.add(thursday_checkbox);
+        checkbox_pane.add(friday_checkbox);
+
         // setup and add buttons
         create_button.addActionListener(cbl);
         cancel_button.addActionListener(cabl);
@@ -337,13 +380,36 @@ class add_course_frame extends JFrame {
         // setup frame
         Container content_pane = getContentPane();
         content_pane.add(label_pane, BorderLayout.LINE_START);
-        content_pane.add(input_pane, BorderLayout.LINE_END);
+        content_pane.add(input_pane, BorderLayout.CENTER);
+        content_pane.add(checkbox_pane, BorderLayout.LINE_END);
         content_pane.add(button_pane, BorderLayout.PAGE_END);
+    }
+
+    class checkbox_listener implements ItemListener {
+        public void itemStateChanged(ItemEvent e) {
+            Object source = e.getItemSelectable();
+
+            if (source == monday_checkbox) {
+                temp_course_monday = true ? monday_checkbox.isSelected() : false;
+            }
+            else if (source == tuesday_checkbox) {
+                temp_course_tuesday = true ? tuesday_checkbox.isSelected() : false;
+            }
+            else if (source == wednesday_checkbox) {
+                temp_course_wednesday = true ? wednesday_checkbox.isSelected() : false;
+            }
+            else if (source == thursday_checkbox) {
+                temp_course_thursday = true ? thursday_checkbox.isSelected() : false;
+            }
+            else if (source == friday_checkbox) {
+                temp_course_friday = true ? friday_checkbox.isSelected() : false;
+            }
+        }
     }
 
     class create_button_listener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            course temp = new course(name_field.getText(), department_field.getText(), number_field.getText(), section_field.getText(), start_time_field.getText(), end_time_field.getText());
+            course temp = new course(name_field.getText(), department_field.getText(), number_field.getText(), section_field.getText(), start_time_field.getText(), end_time_field.getText(), temp_course_monday, temp_course_tuesday, temp_course_wednesday, temp_course_thursday, temp_course_friday);
             PlaceholderName_Main.add_course_to_list(temp);
             course_panel.refresh_list();
             setVisible(false);
