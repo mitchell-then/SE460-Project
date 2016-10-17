@@ -5,30 +5,42 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.JDOMException;
+import javax.swing.*;
+
 
 
 class PlaceholderName_Main {
     private static String xml_file_name = "saved_data.xml";
+    private static List<course> course_list = new ArrayList<>();
+    public static Document xml_doc = null;
 
     public static void main(String[] args) {
-        List<course> course_list = new ArrayList<>();
+        // --------------------------------------------------------------------
+        // initial setup
+        // --------------------------------------------------------------------
         File xml_file = new File(xml_file_name);
         if (!xml_file.exists()) {
             generate_empty_xml();
         }
 
-        Document xml_doc = load_from_xml(course_list);
+        load_from_xml(course_list);
+        // --------------------------------------------------------------------
 
-        course test_course = new course("Some Fake Course Name", "SE", "999", "01", "10:00", "10:50");
-        course test_course_a = new course("Some Fake Course Name", "SE", "999", "01", "10:00", "10:50");
 
-        course_list.add(test_course);
-        course_list.add(test_course_a);
+        JFrame main_gui = new gui();
+        swing_console.run(main_gui);
 
-        save_to_xml(xml_doc, course_list);
+        // gui.refresh();
+        // end_process();
     }
 
-    private static void write_to_xml(Document xml_doc) {
+    public static void end_process() {
+        System.out.println("saving");
+        save_to_xml( course_list);
+        System.exit(0);
+    }
+
+    private static void write_to_xml() {
         File xml_file = new File(xml_file_name);
 
         XMLOutputter xml_out = new XMLOutputter();
@@ -41,7 +53,13 @@ class PlaceholderName_Main {
         }
     }
 
-    private static void save_to_xml(Document xml_doc, List<course> course_list) {
+    private static void save_to_xml(List<course> course_list) {
+        File xml_file = new File(xml_file_name);
+
+        xml_file.delete();
+
+        generate_empty_xml();
+
         // courses
         Element course_root = xml_doc.getRootElement().getChild("courses");
         for (int i = 0; i < course_list.size(); i++) {
@@ -50,13 +68,12 @@ class PlaceholderName_Main {
 
         // TODO: add saving for other objects
 
-        write_to_xml(xml_doc);
+        write_to_xml();
     }
 
-    private static Document load_from_xml(List<course> course_list) {
+    private static void load_from_xml(List<course> course_list) {
         File xml_file = new File(xml_file_name);
         SAXBuilder sax_builder = new SAXBuilder();
-        Document xml_doc = null;
 
         try {
             xml_doc = sax_builder.build(xml_file);
@@ -76,13 +93,11 @@ class PlaceholderName_Main {
             ioe.printStackTrace();
         }
 
-        return xml_doc;
-
     }
 
     private static void generate_empty_xml() {
         Element xml_root = new Element("PlaceholderName");
-        Document xml_doc = new Document(xml_root);
+        xml_doc = new Document(xml_root);
 
         Element courses = new Element("courses");
         xml_doc.getRootElement().addContent(courses);
@@ -92,7 +107,7 @@ class PlaceholderName_Main {
 
         // TODO: add generation for other objects
 
-        write_to_xml(xml_doc);
+        write_to_xml();
     }
 
     private static course xml_to_course(Element course_element) {
@@ -103,10 +118,35 @@ class PlaceholderName_Main {
         String temp_start_time = course_element.getChild("start_time").getText();
         String temp_end_time = course_element.getChild("end_time").getText();
         String temp_notes = course_element.getChild("notes").getText();
+        boolean temp_monday = Boolean.parseBoolean(course_element.getChild("days_of_week").getChild("monday").getText());
+        boolean temp_tuesday = Boolean.parseBoolean(course_element.getChild("days_of_week").getChild("tuesday").getText());
+        boolean temp_wednesday = Boolean.parseBoolean(course_element.getChild("days_of_week").getChild("wednesday").getText());
+        boolean temp_thursday = Boolean.parseBoolean(course_element.getChild("days_of_week").getChild("thursday").getText());
+        boolean temp_friday = Boolean.parseBoolean(course_element.getChild("days_of_week").getChild("friday").getText());
 
-        course temp = new course(temp_name, temp_department, temp_number, temp_section, temp_start_time, temp_end_time);
+        course temp = new course(temp_name, temp_department, temp_number, temp_section, temp_start_time, temp_end_time, temp_monday, temp_tuesday, temp_wednesday, temp_thursday, temp_friday);
         temp.set_notes(temp_notes);
 
         return temp;
+    }
+
+    public static void add_course_to_list(course c) {
+        course_list.add(c);
+    }
+
+    public static void remove_course_from_list(int index) {
+        course_list.remove(index);
+    }
+
+    public static int course_list_size() {
+        return course_list.size();
+    }
+
+    public static boolean is_empty() {
+        return course_list.isEmpty();
+    }
+
+    public static course get_course_at(int index) {
+        return course_list.get(index);
     }
 }
