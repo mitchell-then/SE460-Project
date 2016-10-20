@@ -107,7 +107,7 @@ class course_panel extends JPanel {
         c.gridwidth = 3;
         c.weightx = 0.5;
         c.gridheight = 1;
-        c.fill = GridBagConstraints.HORIZONTAL;
+        c.fill = GridBagConstraints.BOTH;
         this.add(selected_course_name, c);
 
         c.gridx = 1;
@@ -153,12 +153,12 @@ class course_panel extends JPanel {
         c.gridy = 4;
         c.ipady = 0;
         c.weightx = 0;
+        c.weighty = 0.1;
         c.gridwidth = 1;
         this.add(remove_course_button, c);
 
         c.gridx = 1;
         c.gridy = 4;
-        c.weightx = 0;
         this.add(add_course_button, c);
 
         c.gridx = 2;
@@ -168,6 +168,7 @@ class course_panel extends JPanel {
         c.gridx = 3;
         c.gridy = 4;
         this.add(add_course_notes_button, c);
+
         this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
     }
 
