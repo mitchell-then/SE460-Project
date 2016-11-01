@@ -6,13 +6,16 @@ import org.jdom2.output.XMLOutputter;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.JDOMException;
 import javax.swing.*;
+import java.text.*;
 
 
 
 class PlaceholderName_Main {
     private static String xml_file_name = "saved_data.xml";
-    private static List<course> course_list = new ArrayList<>();
     public static Document xml_doc = null;
+
+    private static List<course> course_list = new ArrayList<>();
+    private static List<bill> bill_list = new ArrayList<>();
 
     public static void main(String[] args) {
         // --------------------------------------------------------------------
@@ -23,7 +26,7 @@ class PlaceholderName_Main {
             generate_empty_xml();
         }
 
-        load_from_xml(course_list);
+        load_from_xml();
         // --------------------------------------------------------------------
 
 
@@ -36,7 +39,7 @@ class PlaceholderName_Main {
 
     public static void end_process() {
         System.out.println("saving");
-        save_to_xml( course_list);
+        save_to_xml();
         System.exit(0);
     }
 
@@ -53,7 +56,7 @@ class PlaceholderName_Main {
         }
     }
 
-    private static void save_to_xml(List<course> course_list) {
+    private static void save_to_xml() {
         File xml_file = new File(xml_file_name);
 
         xml_file.delete();
@@ -66,12 +69,17 @@ class PlaceholderName_Main {
             course_root.addContent(course_list.get(i).get_xml());
         }
 
+        Element bill_root = xml_doc.getRootElement().getChild("bills");
+        for (int i = 0; i < bill_list.size(); i++) {
+            bill_root.addContent(bill_list.get(i).get_xml());
+        }
+
         // TODO: add saving for other objects
 
         write_to_xml();
     }
 
-    private static void load_from_xml(List<course> course_list) {
+    private static void load_from_xml() {
         File xml_file = new File(xml_file_name);
         SAXBuilder sax_builder = new SAXBuilder();
 
@@ -79,9 +87,13 @@ class PlaceholderName_Main {
             xml_doc = sax_builder.build(xml_file);
 
             List<Element> xml_course_list = xml_doc.getRootElement().getChild("courses").getChildren();
-
             for (int i = 0; i < xml_course_list.size(); i++) {
                 course_list.add(xml_to_course(xml_course_list.get(i)));
+            }
+
+            List<Element> xml_bill_list = xml_doc.getRootElement().getChild("bills").getChildren();
+            for (int i = 0; i < xml_bill_list.size(); i++) {
+                bill_list.add(xml_to_bill(xml_bill_list.get(i)));
             }
 
             // TODO: add loading for other objects
@@ -110,6 +122,10 @@ class PlaceholderName_Main {
         write_to_xml();
     }
 
+    // ------------------------------------
+    // xml_to
+    // ------------------------------------
+
     private static course xml_to_course(Element course_element) {
         String temp_name = course_element.getChild("name").getText();
         String temp_department = course_element.getChild("department").getText();
@@ -130,11 +146,35 @@ class PlaceholderName_Main {
         return temp;
     }
 
-    public static void add_course_to_list(course c) {
+    private static bill xml_to_bill(Element bill_element) {
+        Date temp_due_date = null;
+        DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+
+        String temp_name = bill_element.getChild("name").getText();
+        String temp_notes = bill_element.getChild("notes").getText();
+        String temp_amount = bill_element.getChild("amount").getText();
+        try {
+            temp_due_date = df.parse(bill_element.getChild("due_date").getText());
+        }
+        catch(ParseException e) {
+            e.printStackTrace();
+        }
+
+        bill temp = new bill(temp_name, temp_amount, df.format(temp_due_date).toString());
+        temp.set_notes(temp_notes);
+
+        return temp;
+    }
+
+
+    // ------------------------------------
+    // course_list
+    // ------------------------------------
+    public static void course_list_add(course c) {
         course_list.add(c);
     }
 
-    public static void remove_course_from_list(int index) {
+    public static void course_list_remove(int index) {
         course_list.remove(index);
     }
 
@@ -142,11 +182,34 @@ class PlaceholderName_Main {
         return course_list.size();
     }
 
-    public static boolean is_empty() {
+    public static boolean course_list_is_empty() {
         return course_list.isEmpty();
     }
 
-    public static course get_course_at(int index) {
+    public static course course_list_get_at(int index) {
         return course_list.get(index);
+    }
+
+    // ------------------------------------
+    // bill_list
+    // ------------------------------------
+    public static void bill_list_add(bill b) {
+        bill_list.add(b);
+    }
+
+    public static void bill_list_remove(int index) {
+        bill_list.remove(index);
+    }
+
+    public static int bill_list_size() {
+        return bill_list.size();
+    }
+
+    public static boolean bill_list_is_empty() {
+        return bill_list.isEmpty();
+    }
+
+    public static bill bill_list_get_at(int index) {
+        return bill_list.get(index);
     }
 }
