@@ -12,6 +12,7 @@ import javax.swing.*;
 class PlaceholderName_Main {
     private static String xml_file_name = "saved_data.xml";
     private static List<course> course_list = new ArrayList<>();
+    private static List<assignment> assignment_list = new ArrayList<>();
     public static Document xml_doc = null;
 
     public static void main(String[] args) {
@@ -23,7 +24,7 @@ class PlaceholderName_Main {
             generate_empty_xml();
         }
 
-        load_from_xml(course_list);
+        load_from_xml();
         // --------------------------------------------------------------------
 
 
@@ -36,7 +37,7 @@ class PlaceholderName_Main {
 
     public static void end_process() {
         System.out.println("saving");
-        save_to_xml( course_list);
+        save_to_xml();
         System.exit(0);
     }
 
@@ -53,7 +54,7 @@ class PlaceholderName_Main {
         }
     }
 
-    private static void save_to_xml(List<course> course_list) {
+    private static void save_to_xml() {
         File xml_file = new File(xml_file_name);
 
         xml_file.delete();
@@ -66,12 +67,18 @@ class PlaceholderName_Main {
             course_root.addContent(course_list.get(i).get_xml());
         }
 
+        // assignments
+        Element assignment_root = xml_doc.getRootElement().getChild("assignments");
+        for (int i = 0; i < assignment_list.size(); i++) {
+            assignment_root.addContent(assignment_list.get(i).get_xml());
+        }
+
         // TODO: add saving for other objects
 
         write_to_xml();
     }
 
-    private static void load_from_xml(List<course> course_list) {
+    private static void load_from_xml() {
         File xml_file = new File(xml_file_name);
         SAXBuilder sax_builder = new SAXBuilder();
 
@@ -79,9 +86,14 @@ class PlaceholderName_Main {
             xml_doc = sax_builder.build(xml_file);
 
             List<Element> xml_course_list = xml_doc.getRootElement().getChild("courses").getChildren();
+            List<Element> xml_assignment_list = xml_doc.getRootElement().getChild("assignments").getChildren();
 
             for (int i = 0; i < xml_course_list.size(); i++) {
                 course_list.add(xml_to_course(xml_course_list.get(i)));
+            }
+
+            for (int i = 0; i < xml_assignment_list.size(); i++) {
+                assignment_list.add(xml_to_assignment(xml_assignment_list.get(i)));
             }
 
             // TODO: add loading for other objects
@@ -95,6 +107,28 @@ class PlaceholderName_Main {
 
     }
 
+    //TODO: This method and the one up above can be merged into one
+    private static void load_assignment_from_xml(List<assignment> assignment_list) {
+        File xml_file = new File(xml_file_name);
+        SAXBuilder sax_builder = new SAXBuilder();
+
+        try {
+            xml_doc = sax_builder.build(xml_file);
+
+            List<Element> xml_assignment_list = xml_doc.getRootElement().getChild("assignments").getChildren();
+
+            for (int i = 0; i < xml_assignment_list.size(); i++) {
+                assignment_list.add(xml_to_assignment(xml_assignment_list.get(i)));
+            }
+        }
+        catch (JDOMException e) {
+            e.printStackTrace();
+        }
+        catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+
+    }
     private static void generate_empty_xml() {
         Element xml_root = new Element("PlaceholderName");
         xml_doc = new Document(xml_root);
@@ -104,6 +138,9 @@ class PlaceholderName_Main {
 
         Element bills = new Element("bills");
         xml_doc.getRootElement().addContent(bills);
+
+        Element assignments = new Element("assignments");
+        xml_doc.getRootElement().addContent(assignments);
 
         // TODO: add generation for other objects
 
@@ -130,6 +167,17 @@ class PlaceholderName_Main {
         return temp;
     }
 
+    private static assignment xml_to_assignment(Element assignment_element) {
+        String temp_name = assignment_element.getChild("name").getText();
+        String temp_description = assignment_element.getChild("description").getText();
+        String temp_course = assignment_element.getChild("course").getText();
+        String temp_grade_percent = assignment_element.getChild("grade_percent").getText();
+
+        assignment temp = new assignment(temp_name, temp_description, temp_course, temp_grade_percent);
+
+        return temp;
+    }
+
     public static void add_course_to_list(course c) {
         course_list.add(c);
     }
@@ -149,4 +197,24 @@ class PlaceholderName_Main {
     public static course get_course_at(int index) {
         return course_list.get(index);
     }
+
+
+    //////
+    public static void add_assignment_to_list(assignment a) {
+        assignment_list.add(a);
+    }
+
+    public static void remove_assignment_from_list(int index) {
+        assignment_list.remove(index);
+    }
+
+    public static int assignment_list_size() {
+        return assignment_list.size();
+    }
+
+    public static assignment get_assignment_at(int index) {
+        return assignment_list.get(index);
+    }
+
+
 }

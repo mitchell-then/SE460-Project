@@ -10,10 +10,12 @@ import javax.swing.border.*;
 class gui extends JFrame {
     private JComponent course_pane = new course_panel();
     private JComponent bill_pane = new bill_panel();
+    private JComponent assignment_pane = new assignment_panel(); 
     public gui() {
         JTabbedPane tabbed_pane = new JTabbedPane();
         tabbed_pane.addTab("Courses", course_pane);
         tabbed_pane.addTab("Bills", bill_pane);
+        tabbed_pane.addTab("Assignments", assignment_pane); 
         this.add(tabbed_pane);
         tabbed_pane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
         this.pack();
@@ -285,6 +287,176 @@ class bill_panel extends JPanel {
     }
 }
 
+class assignment_panel extends JPanel {
+    public static DefaultListModel<String> list_model = new DefaultListModel<>();
+    private static JList<String> assignment_list;
+    private list_selection_listener lsl = new list_selection_listener();
+
+    private info_label selected_assignment_name = new info_label("Name");
+    private info_label selected_assignment_description = new info_label("Description");
+    private info_label selected_course = new info_label("Course");
+    private info_label selected_grade_percent = new info_label("Percent of Final Grade");
+    private JButton add_assignment_button = new JButton("New Assignment");
+    private JButton remove_assignment_button = new JButton("Delete Assignment");
+    private JButton edit_assignment_button = new JButton("Edit Assignment details");
+
+    private create_assignment_button_listener cabl = new create_assignment_button_listener();
+    private remove_assignment_button_listener rabl = new remove_assignment_button_listener();
+    private edit_assignment_button_listener eabl = new edit_assignment_button_listener();
+
+    public assignment_panel() {
+        refresh_list();
+
+        assignment_list = new JList<>(list_model);
+        assignment_list.addListSelectionListener(lsl);
+        assignment_list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        assignment_list.setLayoutOrientation(JList.VERTICAL);
+        assignment_list.setVisibleRowCount(-1);
+        JScrollPane list_scroller = new JScrollPane(assignment_list);
+
+        // buttons
+        add_assignment_button.addActionListener(cabl);
+        remove_assignment_button.addActionListener(rabl);
+        edit_assignment_button.addActionListener(eabl);
+        remove_assignment_button.setEnabled(false);
+        edit_assignment_button.setEnabled(false);
+
+        // setup panel
+        this.setLayout(new GridBagLayout());
+        GridBagConstraints a = new GridBagConstraints();
+        a.fill = GridBagConstraints.HORIZONTAL;
+
+        a.gridx = 0;
+        a.gridy = 0;
+        a.gridheight = 4;
+        a.weighty = 1;
+        a.fill = GridBagConstraints.BOTH;
+        this.add(list_scroller, a);
+
+        a.gridx = 1;
+        a.gridy = 0;
+        a.gridwidth = 3;
+        a.weightx = 0.5;
+        a.gridheight = 1;
+        a.fill = GridBagConstraints.BOTH;
+        this.add(selected_assignment_name, a);
+
+        a.gridx = 1;
+        a.gridy = 1;
+        a.weightx = 0.5;
+        a.gridwidth = 1;
+        this.add(selected_assignment_description, a);
+
+        a.gridx = 2;
+        a.gridy = 1;
+        a.weightx = 0.5;
+        this.add(selected_course, a);
+
+        a.gridx = 3;
+        a.gridy = 1;
+        a.weightx = 0.5;
+        this.add(selected_grade_percent, a);
+
+        a.gridx = 0;
+        a.gridy = 4;
+        a.ipady = 0;
+        a.weightx = 0;
+        a.weighty = 0.1;
+        a.gridwidth = 1;
+        this.add(remove_assignment_button, a);
+
+        a.gridx = 1;
+        a.gridy = 4;
+        this.add(add_assignment_button, a);
+
+        a.gridx = 2;
+        a.gridy = 4;
+        this.add(edit_assignment_button, a);
+
+        this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+    }
+
+    public static void refresh_list() {
+        list_model.clear();
+        for (int i = 0; i < PlaceholderName_Main.assignment_list_size(); i++) {
+            list_model.addElement(PlaceholderName_Main.get_assignment_at(i).get_name());
+        }
+    }
+
+    public static void refresh_list(int index) {
+        list_model.clear();
+        for (int i = 0; i < PlaceholderName_Main.assignment_list_size(); i++) {
+            list_model.addElement(PlaceholderName_Main.get_assignment_at(i).get_name());
+        }
+        assignment_list.setSelectedIndex(index);
+    }
+
+    class list_selection_listener implements ListSelectionListener {
+        public void valueChanged(ListSelectionEvent e) {
+            if (! assignment_list.isSelectionEmpty()) {
+                assignment selected_assignment = PlaceholderName_Main.get_assignment_at(assignment_list.getSelectedIndex());
+
+                selected_assignment_name.setText(selected_assignment.get_name());
+                selected_assignment_description.setText(selected_assignment.get_description());
+                selected_course.setText(selected_assignment.get_course());
+                selected_grade_percent.setText(selected_assignment.get_grade_percent());
+
+                remove_assignment_button.setEnabled(true);
+                edit_assignment_button.setEnabled(true);
+                add_assignment_button.setEnabled(true);
+            }
+            else {
+                selected_assignment_name.setText("");
+                selected_assignment_description.setText("");
+                selected_course.setText("");
+                selected_grade_percent.setText("");
+
+                remove_assignment_button.setEnabled(false);
+                edit_assignment_button.setEnabled(false);
+                add_assignment_button.setEnabled(false);
+            }
+        }
+    }
+
+    class info_label extends JLabel {
+        public info_label(String title) {
+            Border border = BorderFactory.createTitledBorder(title);
+            this.setBorder(border);
+            this.setMinimumSize(new Dimension(144, 36));
+            this.setPreferredSize(new Dimension(144, 36));
+            this.setMaximumSize(new Dimension(144, 36));
+        }
+    }
+
+    class create_assignment_button_listener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            assignment_frame aaf = new assignment_frame();
+            aaf.pack();
+            aaf.setVisible(true);
+        }
+    }
+
+    class remove_assignment_button_listener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            if (! assignment_list.isSelectionEmpty()) {
+                PlaceholderName_Main.remove_assignment_from_list(assignment_list.getSelectedIndex());
+                refresh_list();
+            }
+        }
+    }
+
+    class edit_assignment_button_listener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            if (! assignment_list.isSelectionEmpty()) {
+                edit_assignment_frame eaf = new edit_assignment_frame(assignment_list.getSelectedIndex());
+                eaf.pack();
+                eaf.setVisible(true);
+            }
+        }
+    }
+
+}
+
 class course_frame extends JFrame {
     // ----------------------
     // input text fields
@@ -513,6 +685,137 @@ class course_frame extends JFrame {
     }
 }
 
+// New class
+class assignment_frame extends JFrame {
+
+    protected JTextField name_field = new JTextField();
+    protected JTextField description_field = new JTextField();
+    protected JTextField course_field = new JTextField();
+    protected JFormattedTextField grade_percent_field = new JFormattedTextField(create_formatter("##"));
+
+    protected JLabel name_label = new JLabel("Assignment name: ");
+    protected JLabel description_label = new JLabel("Brief description: ");
+    protected JLabel course_label = new JLabel("Course: ");
+    protected JLabel grade_percent_label = new JLabel("Percent of Final Grade: ");
+
+    protected JButton done_button = new JButton("Done");
+    protected JButton cancel_button = new JButton("Cancel");
+    protected done_button_listener dbl = new done_button_listener();
+    protected cancel_button_listener cbl = new cancel_button_listener();
+
+    public assignment_frame() {
+        JPanel frame_pane = new JPanel();
+        frame_pane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        grade_percent_field.setFocusLostBehavior(JFormattedTextField.PERSIST);
+
+        // setup and add buttons
+        done_button.addActionListener(dbl);
+        cancel_button.addActionListener(cbl);
+
+        // setup panel
+        frame_pane.setLayout(new GridBagLayout());
+        GridBagConstraints a = new GridBagConstraints();
+        a.fill = GridBagConstraints.HORIZONTAL;
+
+        // add name
+        a.gridx = 0;
+        a.gridy = 0;
+        a.weightx = 0.5;
+        frame_pane.add(name_label, a);
+
+        a.gridx = 1;
+        a.gridy = 0;
+        a.gridwidth = 5;
+        a.weightx = 0.5;
+        frame_pane.add(name_field, a);
+
+        // add description
+        a.gridx = 0;
+        a.gridy = 1;
+        a.weightx = 0.5;
+        frame_pane.add(description_label, a);
+
+        a.gridx = 1;
+        a.gridy = 1;
+        a.weightx = 0.5;
+        a.gridwidth = 15;
+        frame_pane.add(description_field, a);
+
+        // add course
+        a.gridx = 0;
+        a.gridy = 2;
+        a.weightx = 0.5;
+        frame_pane.add(course_label, a);
+
+        a.gridx = 1;
+        a.gridy = 2;
+        a.gridwidth = 5;
+        a.weightx = 0.5;
+        frame_pane.add(course_field, a);
+
+        // add grade percent
+        a.gridx = 0;
+        a.gridy = 3;
+        a.weightx = 0.5;
+        frame_pane.add(grade_percent_label, a);
+
+        a.gridx = 1;
+        a.gridy = 3;
+        a.gridwidth = 5;
+        a.weightx = 0.5;
+        frame_pane.add(grade_percent_field, a);
+
+        // add buttons
+        a.gridx = 4;
+        a.gridy = 4;
+        a.gridwidth = 1;
+        a.weightx = 0.5;
+        frame_pane.add(cancel_button, a);
+
+        a.gridx = 5;
+        a.gridy = 4;
+        a.weightx = 0.5;
+        frame_pane.add(done_button, a);
+        this.add(frame_pane);
+    }
+
+    class done_button_listener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            try {
+                assignment temp = new assignment(name_field.getText(), description_field.getText(), course_field.getText(), grade_percent_field.getText());
+                PlaceholderName_Main.add_assignment_to_list(temp);
+                assignment_panel.refresh_list();
+            }
+            catch (Exception ex) {
+                System.err.println("Invalid assignment data: " + ex);
+            }
+            finally {
+                setVisible(false);
+                dispose();
+            }
+        }
+    }
+
+    class cancel_button_listener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            setVisible(false);
+            dispose();
+        }
+    }
+
+    protected MaskFormatter create_formatter(String s) {
+        MaskFormatter formatter = null;
+        try {
+            formatter = new MaskFormatter(s);
+        } catch (java.text.ParseException exc) {
+            System.err.println("formatter is bad: " + exc.getMessage());
+            System.exit(-1);
+        }
+        return formatter;
+    }
+}
+
 class edit_course_frame extends course_frame {
     private int index;
     public edit_course_frame(int i) {
@@ -550,6 +853,36 @@ class edit_course_frame extends course_frame {
             PlaceholderName_Main.get_course_at(index).set_thursday(true ? thursday_checkbox.isSelected() : false);
             PlaceholderName_Main.get_course_at(index).set_friday(true ? friday_checkbox.isSelected() : false);
             course_panel.refresh_list(index);
+            setVisible(false);
+            dispose();
+        }
+    }
+}
+
+// New Class
+class edit_assignment_frame extends assignment_frame {
+    private int index;
+    public edit_assignment_frame(int i) {
+        index = i;
+
+        done_button.removeActionListener(dbl);
+        done_button.addActionListener(new done_button_listener());
+
+        // populate fields with existing data
+        name_field.setText(PlaceholderName_Main.get_assignment_at(index).get_name());
+        description_field.setText(PlaceholderName_Main.get_assignment_at(index).get_description());
+        course_field.setText(PlaceholderName_Main.get_assignment_at(index).get_course());
+        grade_percent_field.setText(PlaceholderName_Main.get_assignment_at(index).get_grade_percent());
+    }
+
+    class done_button_listener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            PlaceholderName_Main.get_assignment_at(index).set_name(name_field.getText());
+            PlaceholderName_Main.get_assignment_at(index).set_description(description_field.getText());
+            PlaceholderName_Main.get_assignment_at(index).set_course(course_field.getText());
+            PlaceholderName_Main.get_assignment_at(index).set_grade_percent(grade_percent_field.getText());
+            
+            assignment_panel.refresh_list(index);
             setVisible(false);
             dispose();
         }
