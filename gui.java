@@ -293,9 +293,10 @@ class assignment_panel extends JPanel {
     private list_selection_listener lsl = new list_selection_listener();
 
     private info_label selected_assignment_name = new info_label("Name");
-    private info_label selected_assignment_description = new info_label("Description");
+    private JTextArea selected_assignment_description = new JTextArea();
     private info_label selected_course = new info_label("Course");
-    private info_label selected_grade_percent = new info_label("Percent of Final Grade");
+    private info_label selected_grade_percent = new info_label("% of Final Grade");
+    private info_label selected_status = new info_label("Status");
     private JButton add_assignment_button = new JButton("New Assignment");
     private JButton remove_assignment_button = new JButton("Delete Assignment");
     private JButton edit_assignment_button = new JButton("Edit Assignment details");
@@ -313,6 +314,13 @@ class assignment_panel extends JPanel {
         assignment_list.setLayoutOrientation(JList.VERTICAL);
         assignment_list.setVisibleRowCount(-1);
         JScrollPane list_scroller = new JScrollPane(assignment_list);
+
+        // Brief description of assignment
+        selected_assignment_description.setEditable(false);
+        selected_assignment_description.setBackground(new Color(238, 238, 238));
+        JScrollPane assignment_scroller = new JScrollPane(selected_assignment_description);
+        Border assignment_scroller_border = BorderFactory.createTitledBorder("Brief description");
+        assignment_scroller.setBorder(assignment_scroller_border);
 
         // buttons
         add_assignment_button.addActionListener(cabl);
@@ -335,17 +343,17 @@ class assignment_panel extends JPanel {
 
         a.gridx = 1;
         a.gridy = 0;
-        a.gridwidth = 3;
+        a.gridwidth = 4;
         a.weightx = 0.5;
         a.gridheight = 1;
         a.fill = GridBagConstraints.BOTH;
-        this.add(selected_assignment_name, a);
+        this.add(assignment_scroller, a);
 
         a.gridx = 1;
         a.gridy = 1;
         a.weightx = 0.5;
         a.gridwidth = 1;
-        this.add(selected_assignment_description, a);
+        this.add(selected_assignment_name, a);
 
         a.gridx = 2;
         a.gridy = 1;
@@ -357,21 +365,25 @@ class assignment_panel extends JPanel {
         a.weightx = 0.5;
         this.add(selected_grade_percent, a);
 
-        a.gridx = 0;
-        a.gridy = 4;
-        a.ipady = 0;
-        a.weightx = 0;
-        a.weighty = 0.1;
-        a.gridwidth = 1;
-        this.add(remove_assignment_button, a);
+        a.gridx = 4;
+        a.gridy = 1;
+        a.weightx = 0.5;
+        this.add(selected_status, a);
 
         a.gridx = 1;
         a.gridy = 4;
+        a.weightx = 0;
+        a.weighty = 0.1;
+        a.gridwidth = 1;
         this.add(add_assignment_button, a);
 
         a.gridx = 2;
         a.gridy = 4;
         this.add(edit_assignment_button, a);
+
+        a.gridx = 3;
+        a.gridy = 4;
+        this.add(remove_assignment_button, a);
 
         this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
     }
@@ -400,6 +412,7 @@ class assignment_panel extends JPanel {
                 selected_assignment_description.setText(selected_assignment.get_description());
                 selected_course.setText(selected_assignment.get_course());
                 selected_grade_percent.setText(selected_assignment.get_grade_percent());
+                selected_status.setText(selected_assignment.get_status());
 
                 remove_assignment_button.setEnabled(true);
                 edit_assignment_button.setEnabled(true);
@@ -410,10 +423,11 @@ class assignment_panel extends JPanel {
                 selected_assignment_description.setText("");
                 selected_course.setText("");
                 selected_grade_percent.setText("");
+                selected_status.setText("");
 
                 remove_assignment_button.setEnabled(false);
                 edit_assignment_button.setEnabled(false);
-                add_assignment_button.setEnabled(false);
+                add_assignment_button.setEnabled(true);
             }
         }
     }
@@ -687,16 +701,17 @@ class course_frame extends JFrame {
 
 // New class
 class assignment_frame extends JFrame {
-
     protected JTextField name_field = new JTextField();
-    protected JTextField description_field = new JTextField();
-    protected JTextField course_field = new JTextField();
+    protected JTextArea description_field = new JTextArea(8, 40);
+    protected JComboBox course_field;
+    protected JComboBox status_field;
     protected JFormattedTextField grade_percent_field = new JFormattedTextField(create_formatter("##"));
 
     protected JLabel name_label = new JLabel("Assignment name: ");
     protected JLabel description_label = new JLabel("Brief description: ");
     protected JLabel course_label = new JLabel("Course: ");
-    protected JLabel grade_percent_label = new JLabel("Percent of Final Grade: ");
+    protected JLabel grade_percent_label = new JLabel("% of Final Grade: ");
+    protected JLabel status_label = new JLabel("Status");
 
     protected JButton done_button = new JButton("Done");
     protected JButton cancel_button = new JButton("Cancel");
@@ -708,6 +723,19 @@ class assignment_frame extends JFrame {
         frame_pane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         grade_percent_field.setFocusLostBehavior(JFormattedTextField.PERSIST);
+
+        // Populate the list of possible courses
+        String current_courses[] = new String[PlaceholderName_Main.course_list_size()];
+
+        for (int i = 0; i < PlaceholderName_Main.course_list_size(); i++) {
+            current_courses[i] = PlaceholderName_Main.get_course_at(i).get_department_and_number();
+        }
+        course_field = new JComboBox(current_courses);
+
+        // Populate the list of possible statuses
+        String [] status = {"Not started", "Started", "Needs more work", "Roadblocked", "Done"};
+
+        status_field = new JComboBox(status);
 
         // setup and add buttons
         done_button.addActionListener(dbl);
@@ -766,15 +794,27 @@ class assignment_frame extends JFrame {
         a.weightx = 0.5;
         frame_pane.add(grade_percent_field, a);
 
-        // add buttons
-        a.gridx = 4;
+        // add status
+        a.gridx = 0;
         a.gridy = 4;
+        a.weightx = 0.5;
+        frame_pane.add(status_label, a);
+
+        a.gridx = 1;
+        a.gridy = 4;
+        a.gridwidth = 5;
+        a.weightx = 0.5;
+        frame_pane.add(status_field, a);
+
+        // add buttons
+        a.gridx = 0;
+        a.gridy = 5;
         a.gridwidth = 1;
         a.weightx = 0.5;
         frame_pane.add(cancel_button, a);
 
-        a.gridx = 5;
-        a.gridy = 4;
+        a.gridx = 1;
+        a.gridy = 5;
         a.weightx = 0.5;
         frame_pane.add(done_button, a);
         this.add(frame_pane);
@@ -783,7 +823,7 @@ class assignment_frame extends JFrame {
     class done_button_listener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             try {
-                assignment temp = new assignment(name_field.getText(), description_field.getText(), course_field.getText(), grade_percent_field.getText());
+                assignment temp = new assignment(name_field.getText(), description_field.getText(), (String)course_field.getSelectedItem(), grade_percent_field.getText(), (String)status_field.getSelectedItem());
                 PlaceholderName_Main.add_assignment_to_list(temp);
                 assignment_panel.refresh_list();
             }
@@ -871,7 +911,6 @@ class edit_assignment_frame extends assignment_frame {
         // populate fields with existing data
         name_field.setText(PlaceholderName_Main.get_assignment_at(index).get_name());
         description_field.setText(PlaceholderName_Main.get_assignment_at(index).get_description());
-        course_field.setText(PlaceholderName_Main.get_assignment_at(index).get_course());
         grade_percent_field.setText(PlaceholderName_Main.get_assignment_at(index).get_grade_percent());
     }
 
@@ -879,8 +918,9 @@ class edit_assignment_frame extends assignment_frame {
         public void actionPerformed(ActionEvent e) {
             PlaceholderName_Main.get_assignment_at(index).set_name(name_field.getText());
             PlaceholderName_Main.get_assignment_at(index).set_description(description_field.getText());
-            PlaceholderName_Main.get_assignment_at(index).set_course(course_field.getText());
+            PlaceholderName_Main.get_assignment_at(index).set_course(course_field.getSelectedItem().toString());
             PlaceholderName_Main.get_assignment_at(index).set_grade_percent(grade_percent_field.getText());
+            PlaceholderName_Main.get_assignment_at(index).set_status(status_field.getSelectedItem().toString());
             
             assignment_panel.refresh_list(index);
             setVisible(false);

@@ -6,12 +6,14 @@ public class assignment {
     private String description;
     private String course;
     private String grade_percent;
+    private String status;
 
-    assignment(String n, String d, String c, String grade_p) {
+    assignment(String n, String d, String c, String grade_p, String status) {
         name          = n;
         description   = d;
         course        = c;
         grade_percent = grade_p;
+        this.status   = status;
     }
 
     public void set_name(String name) {
@@ -30,6 +32,10 @@ public class assignment {
         this.grade_percent = grade_percent;
     }
 
+    public void set_status(String status) {
+        this.status = status;
+    }
+
     public String get_name() { 
         return name; 
     }
@@ -46,11 +52,16 @@ public class assignment {
         return grade_percent;
     }
 
+    public String get_status() {
+        return status;
+    }
+
     public void debug_print() {
         System.out.println("Assignment name: " + name);
         System.out.println("  Description:             [" + description + "]");
         System.out.println("  Course:                  [" + course + "]");
         System.out.println("  Percent of final grade:  [" + grade_percent + "]");
+        System.out.println("  Status of assignment     [" + status + "]");
     }
 
     public Element get_xml() {
@@ -71,6 +82,10 @@ public class assignment {
         Element grade_percent_element = new Element("grade_percent");
         grade_percent_element.setText(grade_percent);
         assignment_element.addContent(grade_percent_element);
+
+        Element status_element = new Element("status");
+        status_element.setText(status);
+        assignment_element.addContent(status_element);
 
         return assignment_element;
     }
