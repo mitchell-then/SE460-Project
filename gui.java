@@ -1417,4 +1417,3 @@ class add_bill_notes_frame extends JFrame {
         }
     }
 }
-
