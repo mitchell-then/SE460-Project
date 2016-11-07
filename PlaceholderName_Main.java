@@ -142,6 +142,7 @@ class PlaceholderName_Main {
         }
 
     }
+
     private static void generate_empty_xml() {
         Element xml_root = new Element("PlaceholderName");
         xml_doc = new Document(xml_root);
