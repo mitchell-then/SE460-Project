@@ -16,12 +16,12 @@ import org.jdatepicker.*;
 class gui extends JFrame {
     private JComponent course_pane = new course_panel();
     private JComponent bill_pane = new bill_panel();
-    private JComponent assignment_pane = new assignment_panel(); 
+    private JComponent assignment_pane = new assignment_panel();
     public gui() {
         JTabbedPane tabbed_pane = new JTabbedPane();
         tabbed_pane.addTab("Courses", course_pane);
         tabbed_pane.addTab("Bills", bill_pane);
-        tabbed_pane.addTab("Assignments", assignment_pane); 
+        tabbed_pane.addTab("Assignments", assignment_pane);
         this.add(tabbed_pane);
         tabbed_pane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
         this.pack();
@@ -1089,7 +1089,7 @@ class assignment_frame extends JFrame {
         String current_courses[] = new String[PlaceholderName_Main.course_list_size()];
 
         for (int i = 0; i < PlaceholderName_Main.course_list_size(); i++) {
-            current_courses[i] = PlaceholderName_Main.get_course_at(i).get_department_and_number();
+            current_courses[i] = PlaceholderName_Main.course_list_get_at(i).get_department_and_number();
         }
         course_field = new JComboBox(current_courses);
 
@@ -1282,7 +1282,7 @@ class edit_assignment_frame extends assignment_frame {
             PlaceholderName_Main.get_assignment_at(index).set_course(course_field.getSelectedItem().toString());
             PlaceholderName_Main.get_assignment_at(index).set_grade_percent(grade_percent_field.getText());
             PlaceholderName_Main.get_assignment_at(index).set_status(status_field.getSelectedItem().toString());
-            
+
             assignment_panel.refresh_list(index);
             setVisible(false);
             dispose();
