@@ -638,9 +638,11 @@ class edit_bill_frame extends bill_frame {
 
     class done_button_listener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
+            DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+
             PlaceholderName_Main.bill_list_get_at(index).set_name(name_field.getText());
             PlaceholderName_Main.bill_list_get_at(index).set_amount(amount_field.getText());
-            PlaceholderName_Main.bill_list_get_at(index).set_due_date(date_picker.getModel().getValue().toString());
+            PlaceholderName_Main.bill_list_get_at(index).set_due_date(df.format((Date) date_picker.getModel().getValue()).toString());
 
             bill_panel.refresh_list(index);
             setVisible(false);
@@ -660,6 +662,7 @@ class assignment_panel extends JPanel {
     private info_label selected_grade_percent = new info_label("% of Final Grade");
     private info_label selected_status = new info_label("Status");
     private info_label selected_actual_grade = new info_label("Grade (%)");
+    private info_label selected_due_date = new info_label("Due Date");
     private JButton add_assignment_button = new JButton("New Assignment");
     private JButton remove_assignment_button = new JButton("Delete Assignment");
     private JButton edit_assignment_button = new JButton("Edit Assignment details");
@@ -738,6 +741,11 @@ class assignment_panel extends JPanel {
         a.weightx = 0.5;
         this.add(selected_actual_grade, a);
 
+        a.gridx = 3;
+        a.gridy = 2;
+        a.weightx = 0.5;
+        this.add(selected_due_date, a);
+
         a.gridx = 1;
         a.gridy = 4;
         a.weightx = 0;
@@ -782,6 +790,12 @@ class assignment_panel extends JPanel {
                 selected_grade_percent.setText(selected_assignment.get_grade_percent());
                 selected_status.setText(selected_assignment.get_status());
                 selected_actual_grade.setText(selected_assignment.get_actual_grade());
+                try {
+                    selected_due_date.setText(selected_assignment.get_due_date_string());
+                }
+                catch (java.lang.NullPointerException exc) {
+                    selected_due_date.setText("");
+                }
 
                 remove_assignment_button.setEnabled(true);
                 edit_assignment_button.setEnabled(true);
@@ -794,6 +808,7 @@ class assignment_panel extends JPanel {
                 selected_grade_percent.setText("");
                 selected_status.setText("");
                 selected_actual_grade.setText("");
+                selected_due_date.setText("");
 
                 remove_assignment_button.setEnabled(false);
                 edit_assignment_button.setEnabled(false);
@@ -1075,12 +1090,17 @@ class assignment_frame extends JFrame {
     protected JComboBox course_field;
     protected JComboBox status_field;
     protected JFormattedTextField grade_percent_field = new JFormattedTextField(create_formatter("##"));
-    
-    // The grades will be recorded as percentages. 
+
+    // The grades will be recorded as percentages.
     // We are not checking for the bounds, since some professors give more
-    // than 100% on certain assignments. 
+    // than 100% on certain assignments.
     NumberFormat gradeFormat = grade_format(1, 3, 2);
     protected JFormattedTextField actual_grade_field = new JFormattedTextField(gradeFormat);
+
+    protected UtilDateModel model;
+    protected Properties p;
+    protected JDatePanelImpl date_panel;
+    protected JDatePickerImpl date_picker;
 
     protected JLabel name_label = new JLabel("Assignment name: ");
     protected JLabel description_label = new JLabel("Brief description: ");
@@ -1088,6 +1108,7 @@ class assignment_frame extends JFrame {
     protected JLabel grade_percent_label = new JLabel("% of Final Grade: ");
     protected JLabel status_label = new JLabel("Status: ");
     protected JLabel actual_grade_label = new JLabel("Grade (%): ");
+    protected JLabel due_date_label = new JLabel("Due Date: ");
 
     protected JButton done_button = new JButton("Done");
     protected JButton cancel_button = new JButton("Cancel");
@@ -1112,6 +1133,15 @@ class assignment_frame extends JFrame {
         String [] status = {"Not started", "Started", "Needs more work", "Roadblocked", "Done"};
 
         status_field = new JComboBox(status);
+
+        // setup date picker
+        model = new UtilDateModel();
+        p = new Properties();
+        p.put("text.today", "Today");
+        p.put("text.month", "Month");
+        p.put("text.year", "Year");
+        date_panel = new JDatePanelImpl(model, p);
+        date_picker = new JDatePickerImpl(date_panel, new DateLabelFormatter());
 
         // setup and add buttons
         done_button.addActionListener(dbl);
@@ -1194,15 +1224,28 @@ class assignment_frame extends JFrame {
         a.weightx = 0.5;
         frame_pane.add(actual_grade_field, a);
 
-        // add buttons
+        // add due date
         a.gridx = 0;
         a.gridy = 6;
+        a.gridwidth = 1;
+        a.weightx = 0.5;
+        frame_pane.add(due_date_label, a);
+
+        a.gridx = 1;
+        a.gridy = 6;
+        a.gridwidth = 1;
+        a.weightx = 0.5;
+        frame_pane.add(date_picker, a);
+
+        // add buttons
+        a.gridx = 0;
+        a.gridy = 7;
         a.gridwidth = 1;
         a.weightx = 0.5;
         frame_pane.add(cancel_button, a);
 
         a.gridx = 1;
-        a.gridy = 6;
+        a.gridy = 7;
         a.weightx = 0.5;
         frame_pane.add(done_button, a);
         this.add(frame_pane);
@@ -1220,7 +1263,13 @@ class assignment_frame extends JFrame {
     class done_button_listener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             try {
+                DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+
                 assignment temp = new assignment(name_field.getText(), description_field.getText(), (String)course_field.getSelectedItem(), grade_percent_field.getText(), (String)status_field.getSelectedItem(), actual_grade_field.getText());
+                // System.out.println(date_picker.getModel().getValue());
+                if (date_picker.getModel().getValue() != null) {
+                    temp.set_due_date(df.format((Date) date_picker.getModel().getValue()).toString());
+                }
                 PlaceholderName_Main.add_assignment_to_list(temp);
                 assignment_panel.refresh_list();
             }
@@ -1313,12 +1362,19 @@ class edit_assignment_frame extends assignment_frame {
 
     class done_button_listener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
+            DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+
             PlaceholderName_Main.get_assignment_at(index).set_name(name_field.getText());
             PlaceholderName_Main.get_assignment_at(index).set_description(description_field.getText());
             PlaceholderName_Main.get_assignment_at(index).set_course(course_field.getSelectedItem().toString());
             PlaceholderName_Main.get_assignment_at(index).set_grade_percent(grade_percent_field.getText());
             PlaceholderName_Main.get_assignment_at(index).set_status(status_field.getSelectedItem().toString());
             PlaceholderName_Main.get_assignment_at(index).set_actual_grade(actual_grade_field.getText());
+            // PlaceholderName_Main.get_assignment_at(index).set_due_date(date_picker.getModel().getValue().toString());
+
+            if (date_picker.getModel().getValue() != null) {
+                PlaceholderName_Main.get_assignment_at(index).set_due_date(df.format((Date) date_picker.getModel().getValue()).toString());
+            }
 
             assignment_panel.refresh_list(index);
             setVisible(false);
