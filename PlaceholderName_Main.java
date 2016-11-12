@@ -185,14 +185,24 @@ class PlaceholderName_Main {
     }
 
     private static assignment xml_to_assignment(Element assignment_element) {
+        Date temp_due_date = null;
+        DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+
         String temp_name = assignment_element.getChild("name").getText();
         String temp_description = assignment_element.getChild("description").getText();
         String temp_course = assignment_element.getChild("course").getText();
         String temp_grade_percent = assignment_element.getChild("grade_percent").getText();
         String temp_status = assignment_element.getChild("status").getText();
         String temp_actual_grade = assignment_element.getChild("actual_grade").getText();
+        try {
+            temp_due_date = df.parse(assignment_element.getChild("due_date").getText());
+        }
+        catch(ParseException e) {
+            e.printStackTrace();
+        }
 
         assignment temp = new assignment(temp_name, temp_description, temp_course, temp_grade_percent, temp_status, temp_actual_grade);
+        temp.set_due_date(df.format(temp_due_date).toString());
 
         return temp;
     }

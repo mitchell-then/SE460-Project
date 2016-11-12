@@ -1,5 +1,8 @@
 import java.time.*;
 import org.jdom2.*;
+import java.text.*;
+import java.util.Date;
+
 
 public class assignment {
     private String name;
@@ -8,6 +11,9 @@ public class assignment {
     private String grade_percent;
     private String status;
     private String actual_grade;
+
+    private Date due_date;
+    private DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
 
     // -----------
     // Constructor
@@ -50,21 +56,29 @@ public class assignment {
         this.actual_grade = actual_grade;
     }
 
+    public void set_due_date(String t) {
+        try {
+            due_date = df.parse(t);
+        }
+        catch(ParseException e) {
+            e.printStackTrace();
+        }
+    }
 
     // -----------
     // Get methods
     // -----------
 
-    public String get_name() { 
-        return name; 
+    public String get_name() {
+        return name;
     }
 
-    public String get_description() { 
-        return description; 
+    public String get_description() {
+        return description;
     }
 
-    public String get_course() { 
-        return course; 
+    public String get_course() {
+        return course;
     }
 
     public String get_grade_percent() {
@@ -79,6 +93,13 @@ public class assignment {
         return actual_grade;
     }
 
+    public Date get_due_date() {
+        return due_date;
+    }
+
+    public String get_due_date_string() {
+        return df.format(due_date).toString();
+    }
 
     // -----------------
     // Debugging methods
@@ -90,6 +111,7 @@ public class assignment {
         System.out.println("  Percent of final grade:  [" + grade_percent + "]");
         System.out.println("  Status of assignment:    [" + status + "]");
         System.out.println("  Actual grade:            [" + actual_grade + "]");
+        System.out.println("  Due date grade:            [" + get_due_date_string() + "]");
     }
 
 
@@ -122,6 +144,10 @@ public class assignment {
         Element actual_grade_element = new Element("actual_grade");
         actual_grade_element.setText(actual_grade);
         assignment_element.addContent(actual_grade_element);
+
+        Element due_date_element = new Element("due_date");
+        due_date_element.setText(get_due_date_string());
+        assignment_element.addContent(due_date_element);
 
         return assignment_element;
     }
