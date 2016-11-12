@@ -190,8 +190,9 @@ class PlaceholderName_Main {
         String temp_course = assignment_element.getChild("course").getText();
         String temp_grade_percent = assignment_element.getChild("grade_percent").getText();
         String temp_status = assignment_element.getChild("status").getText();
+        String temp_actual_grade = assignment_element.getChild("actual_grade").getText();
 
-        assignment temp = new assignment(temp_name, temp_description, temp_course, temp_grade_percent, temp_status);
+        assignment temp = new assignment(temp_name, temp_description, temp_course, temp_grade_percent, temp_status, temp_actual_grade);
 
         return temp;
     }
