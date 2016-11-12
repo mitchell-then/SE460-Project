@@ -8,6 +8,7 @@ import javax.swing.event.*;
 import javax.swing.border.*;
 import java.util.*;
 import java.util.Calendar;
+import java.text.NumberFormat;
 
 import org.jdatepicker.impl.*;
 import org.jdatepicker.util.*;
@@ -658,6 +659,7 @@ class assignment_panel extends JPanel {
     private info_label selected_course = new info_label("Course");
     private info_label selected_grade_percent = new info_label("% of Final Grade");
     private info_label selected_status = new info_label("Status");
+    private info_label selected_actual_grade = new info_label("Grade (%)");
     private JButton add_assignment_button = new JButton("New Assignment");
     private JButton remove_assignment_button = new JButton("Delete Assignment");
     private JButton edit_assignment_button = new JButton("Edit Assignment details");
@@ -697,7 +699,7 @@ class assignment_panel extends JPanel {
 
         a.gridx = 0;
         a.gridy = 0;
-        a.gridheight = 4;
+        a.gridheight = 5;
         a.weighty = 1;
         a.fill = GridBagConstraints.BOTH;
         this.add(list_scroller, a);
@@ -730,6 +732,11 @@ class assignment_panel extends JPanel {
         a.gridy = 1;
         a.weightx = 0.5;
         this.add(selected_status, a);
+
+        a.gridx = 2;
+        a.gridy = 2;
+        a.weightx = 0.5;
+        this.add(selected_actual_grade, a);
 
         a.gridx = 1;
         a.gridy = 4;
@@ -774,6 +781,7 @@ class assignment_panel extends JPanel {
                 selected_course.setText(selected_assignment.get_course());
                 selected_grade_percent.setText(selected_assignment.get_grade_percent());
                 selected_status.setText(selected_assignment.get_status());
+                selected_actual_grade.setText(selected_assignment.get_actual_grade());
 
                 remove_assignment_button.setEnabled(true);
                 edit_assignment_button.setEnabled(true);
@@ -785,6 +793,7 @@ class assignment_panel extends JPanel {
                 selected_course.setText("");
                 selected_grade_percent.setText("");
                 selected_status.setText("");
+                selected_actual_grade.setText("");
 
                 remove_assignment_button.setEnabled(false);
                 edit_assignment_button.setEnabled(false);
@@ -1060,19 +1069,25 @@ class course_frame extends JFrame {
     }
 }
 
-// New class
 class assignment_frame extends JFrame {
     protected JTextField name_field = new JTextField();
     protected JTextArea description_field = new JTextArea(8, 40);
     protected JComboBox course_field;
     protected JComboBox status_field;
     protected JFormattedTextField grade_percent_field = new JFormattedTextField(create_formatter("##"));
+    
+    // The grades will be recorded as percentages. 
+    // We are not checking for the bounds, since some professors give more
+    // than 100% on certain assignments. 
+    NumberFormat gradeFormat = grade_format(1, 3, 2);
+    protected JFormattedTextField actual_grade_field = new JFormattedTextField(gradeFormat);
 
     protected JLabel name_label = new JLabel("Assignment name: ");
     protected JLabel description_label = new JLabel("Brief description: ");
     protected JLabel course_label = new JLabel("Course: ");
     protected JLabel grade_percent_label = new JLabel("% of Final Grade: ");
-    protected JLabel status_label = new JLabel("Status");
+    protected JLabel status_label = new JLabel("Status: ");
+    protected JLabel actual_grade_label = new JLabel("Grade (%): ");
 
     protected JButton done_button = new JButton("Done");
     protected JButton cancel_button = new JButton("Cancel");
@@ -1167,24 +1182,45 @@ class assignment_frame extends JFrame {
         a.weightx = 0.5;
         frame_pane.add(status_field, a);
 
-        // add buttons
+        // add grade
         a.gridx = 0;
         a.gridy = 5;
+        a.weightx = 0.5;
+        frame_pane.add(actual_grade_label, a);
+
+        a.gridx = 1;
+        a.gridy = 5;
+        a.gridwidth = 5;
+        a.weightx = 0.5;
+        frame_pane.add(actual_grade_field, a);
+
+        // add buttons
+        a.gridx = 0;
+        a.gridy = 6;
         a.gridwidth = 1;
         a.weightx = 0.5;
         frame_pane.add(cancel_button, a);
 
         a.gridx = 1;
-        a.gridy = 5;
+        a.gridy = 6;
         a.weightx = 0.5;
         frame_pane.add(done_button, a);
         this.add(frame_pane);
     }
 
+    private NumberFormat grade_format (int minDigits, int maxDigits, int maxDecPlaces) {
+        NumberFormat format = NumberFormat.getNumberInstance();
+        format.setMinimumIntegerDigits(minDigits);
+        format.setMaximumIntegerDigits(maxDigits);
+        format.setMaximumFractionDigits(maxDecPlaces);
+
+        return format;
+    }
+
     class done_button_listener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             try {
-                assignment temp = new assignment(name_field.getText(), description_field.getText(), (String)course_field.getSelectedItem(), grade_percent_field.getText(), (String)status_field.getSelectedItem());
+                assignment temp = new assignment(name_field.getText(), description_field.getText(), (String)course_field.getSelectedItem(), grade_percent_field.getText(), (String)status_field.getSelectedItem(), actual_grade_field.getText());
                 PlaceholderName_Main.add_assignment_to_list(temp);
                 assignment_panel.refresh_list();
             }
@@ -1260,7 +1296,6 @@ class edit_course_frame extends course_frame {
     }
 }
 
-// New Class
 class edit_assignment_frame extends assignment_frame {
     private int index;
     public edit_assignment_frame(int i) {
@@ -1273,6 +1308,7 @@ class edit_assignment_frame extends assignment_frame {
         name_field.setText(PlaceholderName_Main.get_assignment_at(index).get_name());
         description_field.setText(PlaceholderName_Main.get_assignment_at(index).get_description());
         grade_percent_field.setText(PlaceholderName_Main.get_assignment_at(index).get_grade_percent());
+        actual_grade_field.setText(PlaceholderName_Main.get_assignment_at(index).get_actual_grade());
     }
 
     class done_button_listener implements ActionListener {
@@ -1282,6 +1318,7 @@ class edit_assignment_frame extends assignment_frame {
             PlaceholderName_Main.get_assignment_at(index).set_course(course_field.getSelectedItem().toString());
             PlaceholderName_Main.get_assignment_at(index).set_grade_percent(grade_percent_field.getText());
             PlaceholderName_Main.get_assignment_at(index).set_status(status_field.getSelectedItem().toString());
+            PlaceholderName_Main.get_assignment_at(index).set_actual_grade(actual_grade_field.getText());
 
             assignment_panel.refresh_list(index);
             setVisible(false);

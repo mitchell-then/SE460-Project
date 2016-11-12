@@ -7,14 +7,24 @@ public class assignment {
     private String course;
     private String grade_percent;
     private String status;
+    private String actual_grade;
 
-    assignment(String n, String d, String c, String grade_p, String status) {
-        name          = n;
-        description   = d;
-        course        = c;
-        grade_percent = grade_p;
-        this.status   = status;
+    // -----------
+    // Constructor
+    // -----------
+    assignment(String n, String d, String c, String grade_p, String status, String actual_grade) {
+        name              = n;
+        description       = d;
+        course            = c;
+        grade_percent     = grade_p;
+        this.status       = status;
+        this.actual_grade = actual_grade;
     }
+
+
+    // -----------
+    // Set methods
+    // -----------
 
     public void set_name(String name) {
         this.name = name;
@@ -36,6 +46,15 @@ public class assignment {
         this.status = status;
     }
 
+    public void set_actual_grade (String actual_grade) {
+        this.actual_grade = actual_grade;
+    }
+
+
+    // -----------
+    // Get methods
+    // -----------
+
     public String get_name() { 
         return name; 
     }
@@ -56,14 +75,27 @@ public class assignment {
         return status;
     }
 
+    public String get_actual_grade() {
+        return actual_grade;
+    }
+
+
+    // -----------------
+    // Debugging methods
+    // -----------------
     public void debug_print() {
         System.out.println("Assignment name: " + name);
         System.out.println("  Description:             [" + description + "]");
         System.out.println("  Course:                  [" + course + "]");
         System.out.println("  Percent of final grade:  [" + grade_percent + "]");
-        System.out.println("  Status of assignment     [" + status + "]");
+        System.out.println("  Status of assignment:    [" + status + "]");
+        System.out.println("  Actual grade:            [" + actual_grade + "]");
     }
 
+
+    // -------------------
+    // Convert data to XML
+    // -------------------
     public Element get_xml() {
         Element assignment_element = new Element("assignment");
 
@@ -86,6 +118,10 @@ public class assignment {
         Element status_element = new Element("status");
         status_element.setText(status);
         assignment_element.addContent(status_element);
+
+        Element actual_grade_element = new Element("actual_grade");
+        actual_grade_element.setText(actual_grade);
+        assignment_element.addContent(actual_grade_element);
 
         return assignment_element;
     }
