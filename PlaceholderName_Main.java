@@ -169,6 +169,7 @@ class PlaceholderName_Main {
         String temp_department = course_element.getChild("department").getText();
         String temp_number = course_element.getChild("number").getText();
         String temp_section = course_element.getChild("section").getText();
+        String temp_grade = course_element.getChild("grade").getText();
         String temp_start_time = course_element.getChild("start_time").getText();
         String temp_end_time = course_element.getChild("end_time").getText();
         String temp_notes = course_element.getChild("notes").getText();
@@ -178,7 +179,7 @@ class PlaceholderName_Main {
         boolean temp_thursday = Boolean.parseBoolean(course_element.getChild("days_of_week").getChild("thursday").getText());
         boolean temp_friday = Boolean.parseBoolean(course_element.getChild("days_of_week").getChild("friday").getText());
 
-        course temp = new course(temp_name, temp_department, temp_number, temp_section, temp_start_time, temp_end_time, temp_monday, temp_tuesday, temp_wednesday, temp_thursday, temp_friday);
+        course temp = new course(temp_name, temp_department, temp_number, temp_section, temp_grade, temp_start_time, temp_end_time, temp_monday, temp_tuesday, temp_wednesday, temp_thursday, temp_friday);
         temp.set_notes(temp_notes);
 
         return temp;

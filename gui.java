@@ -51,6 +51,7 @@ class course_panel extends JPanel {
     private info_label selected_course_department = new info_label("Department");
     private info_label selected_course_number = new info_label("Number");
     private info_label selected_course_section = new info_label("Section");
+    private info_label selected_course_grade = new info_label("Final Grade");
     private JTextArea selected_course_notes = new JTextArea();
     private info_label selected_course_start_time = new info_label("Start Time");
     private info_label selected_course_end_time = new info_label("End Time");
@@ -113,11 +114,18 @@ class course_panel extends JPanel {
         // labels
         c.gridx = 1;
         c.gridy = 0;
-        c.gridwidth = 3;
+        c.gridwidth = 2;
         c.weightx = 0.5;
         c.gridheight = 1;
         c.fill = GridBagConstraints.BOTH;
         this.add(selected_course_name, c);
+
+        c.gridx = 3;
+        c.gridy = 0;
+        c.gridwidth = 1;
+        c.weightx = 0.5;
+        c.gridheight = 1;
+        this.add(selected_course_grade, c);
 
         c.gridx = 1;
         c.gridy = 1;
@@ -206,6 +214,7 @@ class course_panel extends JPanel {
                 selected_course_number.setText(selected_course.get_number());
                 selected_course_section.setText(selected_course.get_section());
                 selected_course_notes.setText(selected_course.get_notes());
+                selected_course_grade.setText(selected_course.get_grade());
                 selected_course_start_time.setText(selected_course.get_start_time().toString());
                 selected_course_end_time.setText(selected_course.get_end_time().toString());
                 selected_course_days_of_week.setText(selected_course.get_days_of_week());
@@ -222,6 +231,7 @@ class course_panel extends JPanel {
                 selected_course_number.setText("");
                 selected_course_section.setText("");
                 selected_course_notes.setText("");
+                selected_course_grade.setText("");
                 selected_course_start_time.setText("");
                 selected_course_end_time.setText("");
                 selected_course_days_of_week.setText("");
@@ -867,10 +877,14 @@ class course_frame extends JFrame {
     protected JFormattedTextField start_time_field = new JFormattedTextField(create_formatter("##:##"));
     protected JFormattedTextField end_time_field = new JFormattedTextField(create_formatter("##:##"));
 
+    NumberFormat gradeFormat = grade_format(1, 3, 2);
+    protected JFormattedTextField grade_field = new JFormattedTextField(gradeFormat);
+
     // ----------------------
     // labels
     // ----------------------
     protected JLabel name_label = new JLabel("Name: ");
+    protected JLabel grade_label = new JLabel("Final Grade: ");
     protected JLabel department_label = new JLabel("Department: ");
     protected JLabel number_label = new JLabel("Number: ");
     protected JLabel section_label = new JLabel("Section: ");
@@ -1005,6 +1019,17 @@ class course_frame extends JFrame {
         c.weightx = 0.5;
         frame_pane.add(end_time_field, c);
 
+        // add final grade
+        c.gridx = 4;
+        c.gridy = 2;
+        c.weightx = 0.5;
+        frame_pane.add(grade_label, c);
+
+        c.gridx = 5;
+        c.gridy = 2;
+        c.weightx = 0.5;
+        frame_pane.add(grade_field, c);
+
         // add days_of_week
         c.gridx = 0;
         c.gridy = 3;
@@ -1024,6 +1049,15 @@ class course_frame extends JFrame {
         c.weightx = 0.5;
         frame_pane.add(done_button, c);
         this.add(frame_pane);
+    }
+
+    private NumberFormat grade_format (int minDigits, int maxDigits, int maxDecPlaces) {
+        NumberFormat format = NumberFormat.getNumberInstance();
+        format.setMinimumIntegerDigits(minDigits);
+        format.setMaximumIntegerDigits(maxDigits);
+        format.setMaximumFractionDigits(maxDecPlaces);
+
+        return format;
     }
 
     class checkbox_listener implements ItemListener {
@@ -1051,7 +1085,7 @@ class course_frame extends JFrame {
     class done_button_listener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             try {
-                course temp = new course(name_field.getText(), department_field.getText(), number_field.getText(), section_field.getText(), start_time_field.getText(), end_time_field.getText(), temp_course_monday, temp_course_tuesday, temp_course_wednesday, temp_course_thursday, temp_course_friday);
+                course temp = new course(name_field.getText(), department_field.getText(), number_field.getText(), section_field.getText(), grade_field.getText(), start_time_field.getText(), end_time_field.getText(), temp_course_monday, temp_course_tuesday, temp_course_wednesday, temp_course_thursday, temp_course_friday);
                 PlaceholderName_Main.course_list_add(temp);
                 course_panel.refresh_list();
             }
@@ -1315,6 +1349,7 @@ class edit_course_frame extends course_frame {
         department_field.setText(PlaceholderName_Main.course_list_get_at(index).get_department());
         number_field.setText(PlaceholderName_Main.course_list_get_at(index).get_number());
         section_field.setText(PlaceholderName_Main.course_list_get_at(index).get_section());
+        grade_field.setText(PlaceholderName_Main.course_list_get_at(index).get_grade());
         start_time_field.setText(PlaceholderName_Main.course_list_get_at(index).get_start_time().toString());
         end_time_field.setText(PlaceholderName_Main.course_list_get_at(index).get_end_time().toString());
 
@@ -1331,6 +1366,7 @@ class edit_course_frame extends course_frame {
             PlaceholderName_Main.course_list_get_at(index).set_department(department_field.getText());
             PlaceholderName_Main.course_list_get_at(index).set_number(number_field.getText());
             PlaceholderName_Main.course_list_get_at(index).set_section(section_field.getText());
+            PlaceholderName_Main.course_list_get_at(index).set_grade(grade_field.getText());
             PlaceholderName_Main.course_list_get_at(index).set_start_time(start_time_field.getText());
             PlaceholderName_Main.course_list_get_at(index).set_end_time(end_time_field.getText());
             PlaceholderName_Main.course_list_get_at(index).set_monday(true ? monday_checkbox.isSelected() : false);

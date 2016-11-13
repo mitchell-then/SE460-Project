@@ -7,16 +7,18 @@ public class course {
     private String number;
     private String section;
     private String notes;
+    private String grade;
     private boolean[] days_of_week = new boolean[5];
 
     private LocalTime start_time;
     private LocalTime end_time;
 
-    course(String n, String d, String nu, String s, String st, String et, boolean m, boolean tu, boolean w, boolean th, boolean f) {
+    course(String n, String d, String nu, String s, String grade, String st, String et, boolean m, boolean tu, boolean w, boolean th, boolean f) {
         name = n;
         department = d;
         number = nu;
         section = s;
+        this.grade = grade;
         start_time = LocalTime.parse(st);
         end_time = LocalTime.parse(et);
 
@@ -44,6 +46,10 @@ public class course {
 
     public void set_section(String new_section) {
         section = new_section;
+    }
+
+    public void set_grade (String grade) {
+        this.grade = grade;
     }
 
     public void set_start_time(String new_start_time) {
@@ -76,6 +82,8 @@ public class course {
     public String get_number() { return number; }
 
     public String get_section() { return section; }
+
+    public String get_grade() { return grade; }
 
     public LocalTime get_start_time() { return start_time; }
 
@@ -127,6 +135,7 @@ public class course {
         System.out.println("  Department:   [" + department + "]");
         System.out.println("  Number:       [" + number + "]");
         System.out.println("  Section:      [" + section + "]");
+        System.out.println("  Final grade:  [" + grade + "]");
         System.out.println("  Start Time:   [" + start_time.toString() + "]");
         System.out.println("  End Time:     [" + end_time.toString() + "]");
         System.out.println("  Notes:        [" + notes + "]");
@@ -154,6 +163,10 @@ public class course {
         Element section_element = new Element("section");
         section_element.setText(section);
         course_element.addContent(section_element);
+
+        Element grade_element = new Element("grade");
+        grade_element.setText(grade);
+        course_element.addContent(grade_element);
 
         Element start_time_element = new Element("start_time");
         start_time_element.setText(start_time.toString());
