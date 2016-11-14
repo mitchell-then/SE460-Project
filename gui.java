@@ -9,6 +9,8 @@ import javax.swing.border.*;
 import java.util.*;
 import java.util.Calendar;
 import java.text.NumberFormat;
+import java.time.*;
+
 
 import org.jdatepicker.impl.*;
 import org.jdatepicker.util.*;
@@ -18,6 +20,9 @@ class gui extends JFrame {
     private JComponent course_pane = new course_panel();
     private JComponent bill_pane = new bill_panel();
     private JComponent assignment_pane = new assignment_panel();
+
+    // private JOptionPane take_notes_popup = new JOptionPane("Class XX has ended, would you like to take notes?", JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION);
+
     public gui() {
         JTabbedPane tabbed_pane = new JTabbedPane();
         tabbed_pane.addTab("Courses", course_pane);
@@ -27,12 +32,68 @@ class gui extends JFrame {
         tabbed_pane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
         this.pack();
 
+        watch_for_class_end_to_take_notes watcher = new watch_for_class_end_to_take_notes(this);
+        watcher.start();
+
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent windowEvent) {
                 PlaceholderName_Main.end_process();
             }
         });
+    }
+
+    private void watch_for_class_end_to_take_notes() {
+
+    }
+}
+
+class watch_for_class_end_to_take_notes extends Thread {
+    private JFrame owner;
+
+    watch_for_class_end_to_take_notes(JFrame owner) {
+        this.owner = owner;
+    }
+
+    public void run() {
+        while (true) {
+            try { sleep(60000); } catch (Exception e) {}
+            for (int i = 0; i < PlaceholderName_Main.course_list_size(); i++) {
+                LocalTime now = LocalTime.now();
+                Calendar c = Calendar.getInstance();
+                int day_of_week = c.get(Calendar.DAY_OF_WEEK);
+                boolean correct_day = false;
+
+                course temp = PlaceholderName_Main.course_list_get_at(i);
+                // System.out.println("Checking " + temp.get_department_and_number());
+
+                // This could be implemented in a much better way
+                if (day_of_week == 2 && temp.get_monday()) {
+                    correct_day = true;
+                }
+                else if (day_of_week == 3 && temp.get_tuesday()) {
+                    correct_day = true;
+                }
+                else if (day_of_week == 4 && temp.get_wednesday()) {
+                    correct_day = true;
+                }
+                else if (day_of_week == 5 && temp.get_thursday()) {
+                    correct_day = true;
+                }
+                else if (day_of_week == 6 && temp.get_friday()) {
+                    correct_day = true;
+                }
+
+                if (correct_day && temp.get_end_time().getHour() == now.getHour() && temp.get_end_time().getMinute() == now.getMinute()) {
+                    int n = JOptionPane.showConfirmDialog(owner, "Class " + temp.get_department_and_number() + " has ended, would you like to take notes?", "Class Ended!", JOptionPane.YES_NO_OPTION);
+                    if (n == 0) {
+                        add_course_notes_frame acnf = new add_course_notes_frame(i);
+                        acnf.pack();
+                        acnf.setVisible(true);
+                    }
+                }
+            }
+        }
     }
 }
 
