@@ -21,8 +21,6 @@ class gui extends JFrame {
     private JComponent bill_pane = new bill_panel();
     private JComponent assignment_pane = new assignment_panel();
 
-    // private JOptionPane take_notes_popup = new JOptionPane("Class XX has ended, would you like to take notes?", JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION);
-
     public gui() {
         JTabbedPane tabbed_pane = new JTabbedPane();
         tabbed_pane.addTab("Courses", course_pane);
@@ -42,12 +40,10 @@ class gui extends JFrame {
             }
         });
     }
-
-    private void watch_for_class_end_to_take_notes() {
-
-    }
 }
 
+// creating a new thread that will watch the time
+// currently a horrible implementation, should be fixed in the future
 class watch_for_class_end_to_take_notes extends Thread {
     private JFrame owner;
 
@@ -65,9 +61,7 @@ class watch_for_class_end_to_take_notes extends Thread {
                 boolean correct_day = false;
 
                 course temp = PlaceholderName_Main.course_list_get_at(i);
-                // System.out.println("Checking " + temp.get_department_and_number());
 
-                // This could be implemented in a much better way
                 if (day_of_week == 2 && temp.get_monday()) {
                     correct_day = true;
                 }
@@ -1085,6 +1079,8 @@ class course_frame extends JFrame {
         c.weightx = 0.5;
         frame_pane.add(done_button, c);
         this.add(frame_pane);
+
+        this.setTitle("New course");
     }
 
     class checkbox_listener implements ItemListener {
@@ -1384,6 +1380,8 @@ class edit_course_frame extends course_frame {
         wednesday_checkbox.setSelected(PlaceholderName_Main.course_list_get_at(index).get_wednesday());
         thursday_checkbox.setSelected(PlaceholderName_Main.course_list_get_at(index).get_thursday());
         friday_checkbox.setSelected(PlaceholderName_Main.course_list_get_at(index).get_friday());
+
+        this.setTitle("Editing course");
     }
 
     class done_button_listener implements ActionListener {
@@ -1489,6 +1487,8 @@ class add_course_notes_frame extends JFrame {
         Container content_pane = getContentPane();
         content_pane.add(text_pane, BorderLayout.CENTER);
         content_pane.add(button_pane, BorderLayout.PAGE_END);
+
+        this.setTitle(PlaceholderName_Main.course_list_get_at(index).get_department_and_number() + " Notes");
     }
 
     class done_button_listener implements ActionListener {
@@ -1553,6 +1553,8 @@ class add_bill_notes_frame extends JFrame {
         Container content_pane = getContentPane();
         content_pane.add(text_pane, BorderLayout.CENTER);
         content_pane.add(button_pane, BorderLayout.PAGE_END);
+
+        this.setTitle(PlaceholderName_Main.bill_list_get_at(index).get_name() + " Notes");
     }
 
     class done_button_listener implements ActionListener {
