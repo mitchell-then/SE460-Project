@@ -208,21 +208,17 @@ class PlaceholderName_Main {
     }
 
     private static bill xml_to_bill(Element bill_element) {
-        Date temp_due_date = null;
-        DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
-
         String temp_name = bill_element.getChild("name").getText();
         String temp_notes = bill_element.getChild("notes").getText();
         String temp_amount = bill_element.getChild("amount").getText();
-        try {
-            temp_due_date = df.parse(bill_element.getChild("due_date").getText());
-        }
-        catch(ParseException e) {
-            e.printStackTrace();
-        }
+        String temp_due_date = bill_element.getChild("due_date").getText();
+        String temp_reminder_date_time = bill_element.getChild("reminder_date_time").getText();
 
-        bill temp = new bill(temp_name, temp_amount, df.format(temp_due_date).toString());
+        bill temp = new bill(temp_name, temp_amount, temp_due_date);
         temp.set_notes(temp_notes);
+        if (temp_reminder_date_time != null) {
+            temp.set_reminder_date_time(temp_reminder_date_time);
+        }
 
         return temp;
     }

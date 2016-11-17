@@ -30,7 +30,7 @@ class gui extends JFrame {
         tabbed_pane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
         this.pack();
 
-        watch_for_class_end_to_take_notes watcher = new watch_for_class_end_to_take_notes(this);
+        watcher_thread watcher = new watcher_thread(this);
         watcher.start();
 
         this.addWindowListener(new WindowAdapter() {
@@ -42,50 +42,70 @@ class gui extends JFrame {
     }
 }
 
-// creating a new thread that will watch the time
-// currently a horrible implementation, should be fixed in the future
-class watch_for_class_end_to_take_notes extends Thread {
+class watcher_thread extends Thread {
     private JFrame owner;
 
-    watch_for_class_end_to_take_notes(JFrame owner) {
+    watcher_thread(JFrame owner) {
         this.owner = owner;
     }
 
     public void run() {
         while (true) {
-            try { sleep(60000); } catch (Exception e) {}
-            for (int i = 0; i < PlaceholderName_Main.course_list_size(); i++) {
-                LocalTime now = LocalTime.now();
-                Calendar c = Calendar.getInstance();
-                int day_of_week = c.get(Calendar.DAY_OF_WEEK);
-                boolean correct_day = false;
+            watch_for_class_end();
+            watch_for_bill_reminders();
+            try { sleep(60 * 1000); } catch (Exception e) {}
+        }
+    }
 
-                course temp = PlaceholderName_Main.course_list_get_at(i);
+    private void watch_for_class_end() {
+        for (int i = 0; i < PlaceholderName_Main.course_list_size(); i++) {
+            LocalTime now = LocalTime.now();
+            Calendar c = Calendar.getInstance();
+            int day_of_week = c.get(Calendar.DAY_OF_WEEK);
+            boolean correct_day = false;
 
-                if (day_of_week == 2 && temp.get_monday()) {
-                    correct_day = true;
-                }
-                else if (day_of_week == 3 && temp.get_tuesday()) {
-                    correct_day = true;
-                }
-                else if (day_of_week == 4 && temp.get_wednesday()) {
-                    correct_day = true;
-                }
-                else if (day_of_week == 5 && temp.get_thursday()) {
-                    correct_day = true;
-                }
-                else if (day_of_week == 6 && temp.get_friday()) {
-                    correct_day = true;
-                }
+            course temp = PlaceholderName_Main.course_list_get_at(i);
 
-                if (correct_day && temp.get_end_time().getHour() == now.getHour() && temp.get_end_time().getMinute() == now.getMinute()) {
-                    int n = JOptionPane.showConfirmDialog(owner, "Class " + temp.get_department_and_number() + " has ended, would you like to take notes?", "Class Ended!", JOptionPane.YES_NO_OPTION);
-                    if (n == 0) {
-                        add_course_notes_frame acnf = new add_course_notes_frame(i);
-                        acnf.pack();
-                        acnf.setVisible(true);
-                    }
+            if (day_of_week == 2 && temp.get_monday()) {
+                correct_day = true;
+            }
+            else if (day_of_week == 3 && temp.get_tuesday()) {
+                correct_day = true;
+            }
+            else if (day_of_week == 4 && temp.get_wednesday()) {
+                correct_day = true;
+            }
+            else if (day_of_week == 5 && temp.get_thursday()) {
+                correct_day = true;
+            }
+            else if (day_of_week == 6 && temp.get_friday()) {
+                correct_day = true;
+            }
+
+            if (correct_day && temp.get_end_time().getHour() == now.getHour() && temp.get_end_time().getMinute() == now.getMinute()) {
+                int n = JOptionPane.showConfirmDialog(owner, "Class " + temp.get_department_and_number() + " has ended, would you like to take notes?", "Class Ended!", JOptionPane.YES_NO_OPTION);
+                if (n == 0) {
+                    add_course_notes_frame acnf = new add_course_notes_frame(i);
+                    acnf.pack();
+                    acnf.setVisible(true);
                 }
+            }
+        }
+    }
+
+    private void watch_for_bill_reminders() {
+        for (int i = 0; i < PlaceholderName_Main.bill_list_size(); i++) {
+            if (PlaceholderName_Main.bill_list_get_at(i).get_reminder_date_time() == null) {
+                continue;
+            }
+
+            Date current_date = new Date();
+            current_date.setMinutes(50);
+            current_date.setSeconds(0);
+
+            if (current_date.toString().equals(PlaceholderName_Main.bill_list_get_at(i).get_reminder_date_time().toString())) {
+                JOptionPane.showMessageDialog(owner, "Bill " + PlaceholderName_Main.bill_list_get_at(i).get_name() + " is due!", "Reminder...", JOptionPane.WARNING_MESSAGE);
+                PlaceholderName_Main.bill_list_get_at(i).clear_reminder_date_time();
             }
         }
     }
@@ -341,6 +361,7 @@ class bill_panel extends JPanel {
     private info_label selected_bill_name = new info_label("Name");
     private info_label selected_bill_amount = new info_label("Amount");
     private info_label selected_bill_due_date = new info_label("Due Date");
+    private info_label selected_bill_reminder_date_time = new info_label("Reminder");
     private JTextArea selected_bill_notes = new JTextArea();
 
     // ----------------------
@@ -350,11 +371,13 @@ class bill_panel extends JPanel {
     private JButton remove_bill_button = new JButton("Remove Bill");
     private JButton edit_bill_button = new JButton("Edit Bill details");
     private JButton add_bill_notes_button = new JButton("Add Bill notes");
+    private JButton set_bill_reminder_button = new JButton("Set reminder");
 
     private create_bill_button_listener cbbl = new create_bill_button_listener();
     private remove_bill_button_listener rbbl = new remove_bill_button_listener();
     private edit_bill_button_listener ebbl = new edit_bill_button_listener();
     private add_bill_notes_button_listener abnbl = new add_bill_notes_button_listener();
+    private set_bill_reminder_button_listener sbrbl = new set_bill_reminder_button_listener();
 
     public bill_panel() {
         // initially populate list
@@ -380,9 +403,11 @@ class bill_panel extends JPanel {
         remove_bill_button.addActionListener(rbbl);
         edit_bill_button.addActionListener(ebbl);
         add_bill_notes_button.addActionListener(abnbl);
+        set_bill_reminder_button.addActionListener(sbrbl);
         remove_bill_button.setEnabled(false);
         edit_bill_button.setEnabled(false);
         add_bill_notes_button.setEnabled(false);
+        set_bill_reminder_button.setEnabled(false);
 
         // setup panel
         this.setLayout(new GridBagLayout());
@@ -400,7 +425,7 @@ class bill_panel extends JPanel {
         // labels
         c.gridx = 1;
         c.gridy = 0;
-        c.gridwidth = 2;
+        c.gridwidth = 3;
         c.gridheight = 1;
         this.add(selected_bill_name, c);
 
@@ -413,9 +438,13 @@ class bill_panel extends JPanel {
         c.gridy = 1;
         this.add(selected_bill_due_date, c);
 
+        c.gridx = 3;
+        c.gridy = 1;
+        this.add(selected_bill_reminder_date_time, c);
+
         c.gridx = 1;
         c.gridy = 2;
-        c.gridwidth = 2;
+        c.gridwidth = 3;
         c.ipady = 160;
         c.weightx = 0;
         c.weighty = 1;
@@ -423,24 +452,23 @@ class bill_panel extends JPanel {
 
         // buttons
         JPanel button_pane = new JPanel();
-        button_pane.setLayout(new GridLayout(1, 4, 6, 6));
+        button_pane.setLayout(new GridLayout(1, 5, 6, 6));
 
         button_pane.add(remove_bill_button);
         button_pane.add(create_bill_button);
         button_pane.add(edit_bill_button);
         button_pane.add(add_bill_notes_button);
+        button_pane.add(set_bill_reminder_button);
 
         c.gridx = 0;
         c.gridy = 3;
         c.ipady = 0;
         c.weightx = 0;
         c.weighty = 0.1;
-        c.gridwidth = 3;
+        c.gridwidth = 4;
         this.add(button_pane, c);
 
         this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
-
     }
 
     public static void refresh_list() {
@@ -461,19 +489,18 @@ class bill_panel extends JPanel {
     class list_selection_listener implements ListSelectionListener {
         public void valueChanged(ListSelectionEvent e) {
             if (! bill_list.isSelectionEmpty()) {
-                DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
-
-
                 bill selected_bill = PlaceholderName_Main.bill_list_get_at(bill_list.getSelectedIndex());
 
                 selected_bill_name.setText(selected_bill.get_name());
                 selected_bill_amount.setText(selected_bill.get_amount());
-                selected_bill_due_date.setText(df.format(selected_bill.get_due_date()).toString());
+                selected_bill_due_date.setText(selected_bill.get_due_date_string());
+                selected_bill_reminder_date_time.setText(selected_bill.get_reminder_date_time_string());
                 selected_bill_notes.setText(selected_bill.get_notes());
 
                 remove_bill_button.setEnabled(true);
                 edit_bill_button.setEnabled(true);
                 add_bill_notes_button.setEnabled(true);
+                set_bill_reminder_button.setEnabled(true);
 
                 selected_bill_notes.setCaretPosition(0);
             }
@@ -481,11 +508,13 @@ class bill_panel extends JPanel {
                 selected_bill_name.setText("");
                 selected_bill_amount.setText("");
                 selected_bill_due_date.setText("");
+                selected_bill_reminder_date_time.setText("");
                 selected_bill_notes.setText("");
 
                 remove_bill_button.setEnabled(false);
                 edit_bill_button.setEnabled(false);
                 add_bill_notes_button.setEnabled(false);
+                set_bill_reminder_button.setEnabled(false);
             }
         }
     }
@@ -523,6 +552,16 @@ class bill_panel extends JPanel {
                 add_bill_notes_frame abnf = new add_bill_notes_frame(bill_list.getSelectedIndex());
                 abnf.pack();
                 abnf.setVisible(true);
+            }
+        }
+    }
+
+    class set_bill_reminder_button_listener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            if (! bill_list.isSelectionEmpty()) {
+                set_bill_reminder_frame sbrf = new set_bill_reminder_frame(bill_list.getSelectedIndex());
+                sbrf.pack();
+                sbrf.setVisible(true);
             }
         }
     }
@@ -1560,6 +1599,123 @@ class add_bill_notes_frame extends JFrame {
     class done_button_listener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             PlaceholderName_Main.bill_list_get_at(index).set_notes(input_notes.getText());
+            bill_panel.refresh_list(index);
+            setVisible(false);
+            dispose();
+        }
+    }
+
+    class cancel_button_listener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            setVisible(false);
+            dispose();
+        }
+    }
+}
+
+class set_bill_reminder_frame extends JFrame {
+    private int index;
+    private String[] hours = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"};
+    private String[] minutes = {"00", "05", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55"};
+    private String[] am_pm = {"AM", "PM"};
+
+    private JComboBox input_hours = new JComboBox(hours);
+    private JComboBox input_minutes = new JComboBox(minutes);
+    private JComboBox input_am_pm = new JComboBox(am_pm);
+
+    private JLabel input_time_label = new JLabel("Time: ");
+
+    // date picker
+    private UtilDateModel model;
+    private Properties p;
+    private JDatePanelImpl date_panel;
+    private JDatePickerImpl date_picker;
+
+    // ----------------------
+    // buttons
+    // ----------------------
+    private JButton done_button = new JButton("Done");
+    private JButton cancel_button = new JButton("Cancel");
+    private done_button_listener dbl = new done_button_listener();
+    private cancel_button_listener cbl = new cancel_button_listener();
+
+    public set_bill_reminder_frame(int i) {
+        index = i;
+
+        JPanel frame_pane = new JPanel();
+        JPanel button_pane = new JPanel();
+
+        // setup panel
+        frame_pane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        frame_pane.setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.BOTH;
+
+        // time label
+        c.gridx = 0;
+        c.gridy = 0;
+        frame_pane.add(input_time_label, c);
+
+        // input hours
+        c.gridx = 1;
+        c.gridy = 0;
+        frame_pane.add(input_hours, c);
+
+        // input minutes
+        c.gridx = 2;
+        c.gridy = 0;
+        frame_pane.add(input_minutes, c);
+
+        // input minutes
+        c.gridx = 3;
+        c.gridy = 0;
+        frame_pane.add(input_am_pm, c);
+
+        // date picker
+        model = new UtilDateModel();
+        p = new Properties();
+        p.put("text.today", "Today");
+        p.put("text.month", "Month");
+        p.put("text.year", "Year");
+        date_panel = new JDatePanelImpl(model, p);
+        date_picker = new JDatePickerImpl(date_panel, new DateLabelFormatter());
+
+        c.gridx = 0;
+        c.gridy = 1;
+        c.gridwidth = 4;
+        frame_pane.add(date_picker, c);
+
+        // setup and add buttons
+        done_button.addActionListener(dbl);
+        cancel_button.addActionListener(cbl);
+        button_pane.add(Box.createHorizontalGlue());
+        button_pane.add(cancel_button);
+        button_pane.add(Box.createRigidArea(new Dimension(10, 0)));
+        button_pane.add(done_button);
+
+        c.gridx = 0;
+        c.gridy = 2;
+        c.gridwidth = 4;
+        frame_pane.add(button_pane, c);
+
+        this.add(frame_pane);
+
+        this.setTitle("Set Reminder");
+    }
+
+    class done_button_listener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+            int hour_offset;
+            if (input_am_pm.getSelectedItem() == "PM") {
+                hour_offset = 12;
+            }
+            else {
+                hour_offset = 0;
+            }
+            int modified_hour = Integer.parseInt(input_hours.getSelectedItem().toString()) + hour_offset;
+            String date_time = df.format((Date) date_picker.getModel().getValue()).toString() + " " + Integer.toString(modified_hour) + ":" + (String)input_minutes.getSelectedItem();
+            PlaceholderName_Main.bill_list_get_at(index).set_reminder_date_time(date_time);
             bill_panel.refresh_list(index);
             setVisible(false);
             dispose();
