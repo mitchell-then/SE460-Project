@@ -9,6 +9,7 @@ import javax.swing.border.*;
 import java.util.*;
 import java.util.Calendar;
 import java.text.NumberFormat;
+import java.util.List;
 
 import org.jdatepicker.impl.*;
 import org.jdatepicker.util.*;
@@ -64,11 +65,13 @@ class course_panel extends JPanel {
     private JButton remove_course_button = new JButton("Remove Course");
     private JButton edit_course_button = new JButton("Edit Course details");
     private JButton add_course_notes_button = new JButton("Add Course notes");
+    private JButton view_schedule_button = new JButton("View schedule");
 
     private create_course_button_listener ccbl = new create_course_button_listener();
     private remove_course_button_listener rcbl = new remove_course_button_listener();
     private edit_course_button_listener ecbl = new edit_course_button_listener();
     private add_course_notes_button_listener acnbl = new add_course_notes_button_listener();
+    private view_schedule_button_listener vsbl = new view_schedule_button_listener();
 
     public course_panel() {
         // initially populate list
@@ -94,6 +97,7 @@ class course_panel extends JPanel {
         remove_course_button.addActionListener(rcbl);
         edit_course_button.addActionListener(ecbl);
         add_course_notes_button.addActionListener(acnbl);
+        view_schedule_button.addActionListener(vsbl);
         remove_course_button.setEnabled(false);
         edit_course_button.setEnabled(false);
         add_course_notes_button.setEnabled(false);
@@ -160,7 +164,7 @@ class course_panel extends JPanel {
 
         c.gridx = 1;
         c.gridy = 3;
-        c.gridwidth = 3;
+        c.gridwidth = 4;
         c.ipady = 80;
         c.weightx = 0;
         this.add(notes_scroller, c);
@@ -185,6 +189,10 @@ class course_panel extends JPanel {
         c.gridx = 3;
         c.gridy = 4;
         this.add(add_course_notes_button, c);
+
+        c.gridx = 4;
+        c.gridy = 4;
+        this.add(view_schedule_button, c);
 
         this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
     }
@@ -278,6 +286,14 @@ class course_panel extends JPanel {
                 acnf.pack();
                 acnf.setVisible(true);
             }
+        }
+    }
+
+    class view_schedule_button_listener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            schedule_frame asf = new schedule_frame();
+            asf.pack();
+            asf.setVisible(true);
         }
     }
 }
@@ -1116,6 +1132,77 @@ class course_frame extends JFrame {
         }
         return formatter;
     }
+}
+
+
+// New schedule frame class
+
+class schedule_frame extends JFrame {
+   private JTextArea schedule_area = new JTextArea();
+   private String schedule;
+
+   public schedule_frame() {
+
+       refresh_schedule();
+
+       // Schedule area
+       schedule_area.setEditable(false);
+       schedule_area.setBackground(new Color(238, 238, 238));
+       JScrollPane schedule_scroller = new JScrollPane(schedule_area);
+       Border schedule_scroller_border = BorderFactory.createTitledBorder("Course Schedule");
+       schedule_scroller.setBorder(schedule_scroller_border);
+       schedule_area.setText(schedule);
+
+       // setup panel
+       this.setLayout(new GridBagLayout());
+       GridBagConstraints a = new GridBagConstraints();
+       a.fill = GridBagConstraints.HORIZONTAL;
+
+       a.gridx = 0;
+       a.gridy = 0;
+       a.gridwidth = 4;
+       a.weightx = 0.5;
+       a.gridheight = 1;
+       a.fill = GridBagConstraints.BOTH;
+       this.add(schedule_scroller, a);
+   }
+
+   public void refresh_schedule() {
+       schedule = "";
+       String[] days = {"MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"};
+
+       // Query the list of courses for each business day of the week
+       for (int i = 0; i < days.length; i++) {
+           List<course> courses_per_day = new ArrayList<>();
+           schedule += "\n" + days[i] + "\n";
+
+           for (int j = 0; j < PlaceholderName_Main.course_list_size(); j++)
+               if (PlaceholderName_Main.course_list_get_at(j).get_specific_day(i))
+                  courses_per_day.add(PlaceholderName_Main.course_list_get_at(j));
+
+           if (courses_per_day.size() > 0) {
+               Collections.sort(courses_per_day);
+               
+               for (int j = 0; j < courses_per_day.size(); j++)
+                   schedule += "  " + courses_per_day.get(j).get_start_time() + "-" +
+                                  courses_per_day.get(j).get_end_time() + " " +
+                                  courses_per_day.get(j).get_department() + " " +
+                                  courses_per_day.get(j).get_number() + " " +
+                                  courses_per_day.get(j).get_name() + " \n";
+           }
+
+       }
+   }
+
+   class info_label extends JLabel {
+       public info_label(String title) {
+           Border border = BorderFactory.createTitledBorder(title);
+           this.setBorder(border);
+           this.setMinimumSize(new Dimension(144, 36));
+           this.setPreferredSize(new Dimension(144, 36));
+           this.setMaximumSize(new Dimension(144, 36));
+       }
+   }
 }
 
 class assignment_frame extends JFrame {

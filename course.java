@@ -1,7 +1,7 @@
 import java.time.*;
 import org.jdom2.*;
 
-public class course {
+public class course implements Comparable<course> {
     private String name;
     private String department;
     private String number;
@@ -115,6 +115,8 @@ public class course {
         return out;
     }
 
+    public boolean get_specific_day(int i) { return days_of_week[i]; }
+
     public boolean get_monday() { return days_of_week[0]; }
     public boolean get_tuesday() { return days_of_week[1]; }
     public boolean get_wednesday() { return days_of_week[2]; }
@@ -205,5 +207,9 @@ public class course {
         course_element.addContent(days_of_week_element);
 
         return course_element;
+    }
+
+    public int compareTo(course c) {
+        return start_time.compareTo(c.start_time);
     }
 }
