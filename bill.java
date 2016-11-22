@@ -10,15 +10,16 @@ public class bill {
     private String amount;
 
     private Date due_date;
-    private DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+    private DateFormat due_date_format = new SimpleDateFormat("MM/dd/yyyy");
 
-
+    private Date reminder_date_time;
+    private DateFormat reminder_date_time_format = new SimpleDateFormat("MM/dd/yyyy HH:mm");
 
     bill(String n, String a, String t) {
         name = n;
         amount = a;
         try {
-            due_date = df.parse(t);
+            due_date = due_date_format.parse(t);
         }
         catch(ParseException e) {
             e.printStackTrace();
@@ -42,11 +43,26 @@ public class bill {
 
     public void set_due_date(String t) {
         try {
-            due_date = df.parse(t);
+            due_date = due_date_format.parse(t);
         }
         catch(ParseException e) {
             e.printStackTrace();
         }
+    }
+
+    public void set_reminder_date_time(String t) {
+        if (t != "") {
+            try {
+                reminder_date_time = reminder_date_time_format.parse(t);
+            }
+            catch(ParseException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void clear_reminder_date_time() {
+        reminder_date_time = null;
     }
 
     // ------------------------------------
@@ -56,6 +72,16 @@ public class bill {
     public String get_notes() { return notes; }
     public String get_amount() { return amount; }
     public Date get_due_date() { return due_date; }
+    public String get_due_date_string() { return due_date_format.format(due_date).toString(); }
+    public Date get_reminder_date_time() { return reminder_date_time; }
+    public String get_reminder_date_time_string() {
+        try {
+            return reminder_date_time_format.format(reminder_date_time).toString();
+        }
+        catch (Exception e) {
+            return "";
+        }
+    }
 
     // ------------------------------------
     // debug
@@ -65,7 +91,8 @@ public class bill {
         System.out.println("  name:     [" + name + "]");
         System.out.println("  notes:    [" + notes + "]");
         System.out.println("  amount:   [" + amount + "]");
-        System.out.println("  due date: [" + df.format(due_date).toString() + "]");
+        System.out.println("  due date: [" + get_due_date_string() + "]");
+        System.out.println("  reminder: [" + get_reminder_date_time_string() + "]");
     }
 
     // ------------------------------------
@@ -87,8 +114,12 @@ public class bill {
         bill_element.addContent(amount_element);
 
         Element due_date_element = new Element("due_date");
-        due_date_element.setText(df.format(due_date).toString());
+        due_date_element.setText(get_due_date_string());
         bill_element.addContent(due_date_element);
+
+        Element reminder_date_time_element = new Element("reminder_date_time");
+        reminder_date_time_element.setText(get_reminder_date_time_string());
+        bill_element.addContent(reminder_date_time_element);
 
         return bill_element;
     }
