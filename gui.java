@@ -188,7 +188,9 @@ class course_panel extends JPanel {
         c.gridheight = 4;
         c.weighty = 1;
         c.fill = GridBagConstraints.BOTH;
+        c.ipadx = 110;
         this.add(list_scroller, c);
+        c.ipadx = 0;
 
         // labels
         c.gridx = 1;
@@ -446,7 +448,9 @@ class bill_panel extends JPanel {
         c.gridheight = 3;
         c.weighty = 1;
         c.weightx = 0.5;
+        c.ipadx = 110;
         this.add(list_scroller, c);
+        c.ipadx = 0;
 
         // labels
         c.gridx = 1;
@@ -825,7 +829,9 @@ class assignment_panel extends JPanel {
         a.gridheight = 5;
         a.weighty = 1;
         a.fill = GridBagConstraints.BOTH;
+        a.ipadx = 110;
         this.add(list_scroller, a);
+        a.ipadx = 0;
 
         a.gridx = 1;
         a.gridy = 0;
@@ -1278,7 +1284,7 @@ class schedule_frame extends JFrame {
 
            if (courses_per_day.size() > 0) {
                Collections.sort(courses_per_day);
-               
+
                for (int j = 0; j < courses_per_day.size(); j++)
                    schedule += "  " + courses_per_day.get(j).get_start_time() + "-" +
                                   courses_per_day.get(j).get_end_time() + " " +
