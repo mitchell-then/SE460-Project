@@ -38,7 +38,6 @@ class PlaceholderName_Main {
     }
 
     public static void end_process() {
-        System.out.println("saving");
         save_to_xml();
         System.exit(0);
     }
