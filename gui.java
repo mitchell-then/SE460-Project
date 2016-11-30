@@ -45,15 +45,21 @@ class gui extends JFrame {
 
 class watcher_thread extends Thread {
     private JFrame owner;
+    private boolean notification_flag;
 
     watcher_thread(JFrame owner) {
         this.owner = owner;
+        notification_flag = false;
     }
 
     public void run() {
         while (true) {
             watch_for_class_end();
             watch_for_bill_reminders();
+
+            if (!notification_flag)
+                watch_for_assignment_reminders();
+
             try { sleep(60 * 1000); } catch (Exception e) {}
         }
     }
@@ -109,6 +115,40 @@ class watcher_thread extends Thread {
                 PlaceholderName_Main.bill_list_get_at(i).clear_reminder_date_time();
             }
         }
+    }
+
+    private void watch_for_assignment_reminders() {
+        int due_count = 0;
+        int overdue_count = 0;
+        String due_notification = "\nASSIGNMENTS THAT ARE DUE SOON: \n";
+        String overdue_notification = "\nASSIGNMENTS THAT ARE OVERDUE: \n";
+        String final_notification = "";
+        Date current_date = new Date();
+
+        for (int i = 0; i < PlaceholderName_Main.assignment_list_size(); i++) {
+            assignment temp = PlaceholderName_Main.get_assignment_at(i);
+            
+            if (!temp.get_status().equals("Done")) {
+                if (temp.get_due_date().compareTo(current_date) > 0 || temp.get_due_date().compareTo(current_date) == 0) {
+                    due_count++;
+                    due_notification += "   " + due_count + ". Assignment " + temp.get_name() + " is due on " + temp.get_due_date_string() + "! \n";
+                }
+                else {
+                    overdue_count++;
+                    overdue_notification += "   " + overdue_count + ". Assignment " + temp.get_name() + " was due on " + temp.get_due_date_string() + "! \n";
+                }
+            }
+        }
+
+        if (overdue_count > 0)
+            final_notification += overdue_notification;
+        if (due_count > 0) 
+            final_notification += due_notification;
+
+        if (final_notification != "")
+            JOptionPane.showMessageDialog(owner, final_notification, "Reminder...", JOptionPane.WARNING_MESSAGE);
+
+        notification_flag = true;
     }
 }
 
