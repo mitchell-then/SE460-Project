@@ -9,7 +9,7 @@ import javax.swing.*;
 import java.text.*;
 
 
-class PlaceholderName_Main {
+class SIMPL {
     private static String xml_file_name = "saved_data.xml";
     public static Document xml_doc = null;
 

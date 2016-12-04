@@ -37,7 +37,7 @@ class gui extends JFrame {
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent windowEvent) {
-                PlaceholderName_Main.end_process();
+                SIMPL.end_process();
             }
         });
     }
@@ -65,13 +65,13 @@ class watcher_thread extends Thread {
     }
 
     private void watch_for_class_end() {
-        for (int i = 0; i < PlaceholderName_Main.course_list_size(); i++) {
+        for (int i = 0; i < SIMPL.course_list_size(); i++) {
             LocalTime now = LocalTime.now();
             Calendar c = Calendar.getInstance();
             int day_of_week = c.get(Calendar.DAY_OF_WEEK);
             boolean correct_day = false;
 
-            course temp = PlaceholderName_Main.course_list_get_at(i);
+            course temp = SIMPL.course_list_get_at(i);
 
             if (day_of_week == 2 && temp.get_monday()) {
                 correct_day = true;
@@ -101,8 +101,8 @@ class watcher_thread extends Thread {
     }
 
     private void watch_for_bill_reminders() {
-        for (int i = 0; i < PlaceholderName_Main.bill_list_size(); i++) {
-            if (PlaceholderName_Main.bill_list_get_at(i).get_reminder_date_time() == null) {
+        for (int i = 0; i < SIMPL.bill_list_size(); i++) {
+            if (SIMPL.bill_list_get_at(i).get_reminder_date_time() == null) {
                 continue;
             }
 
@@ -110,9 +110,9 @@ class watcher_thread extends Thread {
             current_date.setMinutes(50);
             current_date.setSeconds(0);
 
-            if (current_date.toString().equals(PlaceholderName_Main.bill_list_get_at(i).get_reminder_date_time().toString())) {
-                JOptionPane.showMessageDialog(owner, "Bill " + PlaceholderName_Main.bill_list_get_at(i).get_name() + " is due!", "Reminder...", JOptionPane.WARNING_MESSAGE);
-                PlaceholderName_Main.bill_list_get_at(i).clear_reminder_date_time();
+            if (current_date.toString().equals(SIMPL.bill_list_get_at(i).get_reminder_date_time().toString())) {
+                JOptionPane.showMessageDialog(owner, "Bill " + SIMPL.bill_list_get_at(i).get_name() + " is due!", "Reminder...", JOptionPane.WARNING_MESSAGE);
+                SIMPL.bill_list_get_at(i).clear_reminder_date_time();
             }
         }
     }
@@ -125,9 +125,9 @@ class watcher_thread extends Thread {
         String final_notification = "";
         Date current_date = new Date();
 
-        for (int i = 0; i < PlaceholderName_Main.assignment_list_size(); i++) {
-            assignment temp = PlaceholderName_Main.get_assignment_at(i);
-            
+        for (int i = 0; i < SIMPL.assignment_list_size(); i++) {
+            assignment temp = SIMPL.get_assignment_at(i);
+
             if (!temp.get_status().equals("Done")) {
                 if (temp.get_due_date().compareTo(current_date) > 0 || temp.get_due_date().compareTo(current_date) == 0) {
                     due_count++;
@@ -142,7 +142,7 @@ class watcher_thread extends Thread {
 
         if (overdue_count > 0)
             final_notification += overdue_notification;
-        if (due_count > 0) 
+        if (due_count > 0)
             final_notification += due_notification;
 
         if (final_notification != "")
@@ -316,15 +316,15 @@ class course_panel extends JPanel {
 
     public static void refresh_list() {
         list_model.clear();
-        for (int i = 0; i < PlaceholderName_Main.course_list_size(); i++) {
-            list_model.addElement(PlaceholderName_Main.course_list_get_at(i).get_department_and_number());
+        for (int i = 0; i < SIMPL.course_list_size(); i++) {
+            list_model.addElement(SIMPL.course_list_get_at(i).get_department_and_number());
         }
     }
 
     public static void refresh_list(int index) {
         list_model.clear();
-        for (int i = 0; i < PlaceholderName_Main.course_list_size(); i++) {
-            list_model.addElement(PlaceholderName_Main.course_list_get_at(i).get_department_and_number());
+        for (int i = 0; i < SIMPL.course_list_size(); i++) {
+            list_model.addElement(SIMPL.course_list_get_at(i).get_department_and_number());
         }
         course_list.setSelectedIndex(index);
     }
@@ -332,7 +332,7 @@ class course_panel extends JPanel {
     class list_selection_listener implements ListSelectionListener {
         public void valueChanged(ListSelectionEvent e) {
             if (! course_list.isSelectionEmpty()) {
-                course selected_course = PlaceholderName_Main.course_list_get_at(course_list.getSelectedIndex());
+                course selected_course = SIMPL.course_list_get_at(course_list.getSelectedIndex());
 
                 selected_course_name.setText(selected_course.get_name());
                 selected_course_department.setText(selected_course.get_department());
@@ -380,7 +380,7 @@ class course_panel extends JPanel {
     class remove_course_button_listener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             if (! course_list.isSelectionEmpty()) {
-                PlaceholderName_Main.course_list_remove(course_list.getSelectedIndex());
+                SIMPL.course_list_remove(course_list.getSelectedIndex());
                 refresh_list();
             }
         }
@@ -543,15 +543,15 @@ class bill_panel extends JPanel {
 
     public static void refresh_list() {
         list_model.clear();
-        for (int i = 0; i < PlaceholderName_Main.bill_list_size(); i++) {
-            list_model.addElement(PlaceholderName_Main.bill_list_get_at(i).get_name());
+        for (int i = 0; i < SIMPL.bill_list_size(); i++) {
+            list_model.addElement(SIMPL.bill_list_get_at(i).get_name());
         }
     }
 
     public static void refresh_list(int index) {
         list_model.clear();
-        for (int i = 0; i < PlaceholderName_Main.bill_list_size(); i++) {
-            list_model.addElement(PlaceholderName_Main.bill_list_get_at(i).get_name());
+        for (int i = 0; i < SIMPL.bill_list_size(); i++) {
+            list_model.addElement(SIMPL.bill_list_get_at(i).get_name());
         }
         bill_list.setSelectedIndex(index);
     }
@@ -559,7 +559,7 @@ class bill_panel extends JPanel {
     class list_selection_listener implements ListSelectionListener {
         public void valueChanged(ListSelectionEvent e) {
             if (! bill_list.isSelectionEmpty()) {
-                bill selected_bill = PlaceholderName_Main.bill_list_get_at(bill_list.getSelectedIndex());
+                bill selected_bill = SIMPL.bill_list_get_at(bill_list.getSelectedIndex());
 
                 selected_bill_name.setText(selected_bill.get_name());
                 selected_bill_amount.setText(selected_bill.get_amount());
@@ -600,7 +600,7 @@ class bill_panel extends JPanel {
     class remove_bill_button_listener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             if (! bill_list.isSelectionEmpty()) {
-                PlaceholderName_Main.bill_list_remove(bill_list.getSelectedIndex());
+                SIMPL.bill_list_remove(bill_list.getSelectedIndex());
                 refresh_list();
             }
         }
@@ -765,7 +765,7 @@ class bill_frame extends JFrame {
                 // System.out.println(df.format((Date) date_picker.getModel().getValue()).toString());
                 // Calendar temp_value =
                 bill temp = new bill(name_field.getText(), amount_field.getText(), df.format((Date) date_picker.getModel().getValue()).toString());
-                PlaceholderName_Main.bill_list_add(temp);
+                SIMPL.bill_list_add(temp);
                 bill_panel.refresh_list();
             }
             catch (Exception ex) {
@@ -795,18 +795,18 @@ class edit_bill_frame extends bill_frame {
         done_button.addActionListener(new done_button_listener());
 
         // populate fields with existing data
-        name_field.setText(PlaceholderName_Main.bill_list_get_at(index).get_name());
-        amount_field.setText(PlaceholderName_Main.bill_list_get_at(index).get_amount());
-        // model.setDate(PlaceholderName_Main.bill_list_get_at(index).get_due_date());
+        name_field.setText(SIMPL.bill_list_get_at(index).get_name());
+        amount_field.setText(SIMPL.bill_list_get_at(index).get_amount());
+        // model.setDate(SIMPL.bill_list_get_at(index).get_due_date());
     }
 
     class done_button_listener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
 
-            PlaceholderName_Main.bill_list_get_at(index).set_name(name_field.getText());
-            PlaceholderName_Main.bill_list_get_at(index).set_amount(amount_field.getText());
-            PlaceholderName_Main.bill_list_get_at(index).set_due_date(df.format((Date) date_picker.getModel().getValue()).toString());
+            SIMPL.bill_list_get_at(index).set_name(name_field.getText());
+            SIMPL.bill_list_get_at(index).set_amount(amount_field.getText());
+            SIMPL.bill_list_get_at(index).set_due_date(df.format((Date) date_picker.getModel().getValue()).toString());
 
             bill_panel.refresh_list(index);
             setVisible(false);
@@ -932,15 +932,15 @@ class assignment_panel extends JPanel {
 
     public static void refresh_list() {
         list_model.clear();
-        for (int i = 0; i < PlaceholderName_Main.assignment_list_size(); i++) {
-            list_model.addElement(PlaceholderName_Main.get_assignment_at(i).get_name());
+        for (int i = 0; i < SIMPL.assignment_list_size(); i++) {
+            list_model.addElement(SIMPL.get_assignment_at(i).get_name());
         }
     }
 
     public static void refresh_list(int index) {
         list_model.clear();
-        for (int i = 0; i < PlaceholderName_Main.assignment_list_size(); i++) {
-            list_model.addElement(PlaceholderName_Main.get_assignment_at(i).get_name());
+        for (int i = 0; i < SIMPL.assignment_list_size(); i++) {
+            list_model.addElement(SIMPL.get_assignment_at(i).get_name());
         }
         assignment_list.setSelectedIndex(index);
     }
@@ -948,7 +948,7 @@ class assignment_panel extends JPanel {
     class list_selection_listener implements ListSelectionListener {
         public void valueChanged(ListSelectionEvent e) {
             if (! assignment_list.isSelectionEmpty()) {
-                assignment selected_assignment = PlaceholderName_Main.get_assignment_at(assignment_list.getSelectedIndex());
+                assignment selected_assignment = SIMPL.get_assignment_at(assignment_list.getSelectedIndex());
 
                 selected_assignment_name.setText(selected_assignment.get_name());
                 selected_assignment_description.setText(selected_assignment.get_description());
@@ -1004,7 +1004,7 @@ class assignment_panel extends JPanel {
     class remove_assignment_button_listener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             if (! assignment_list.isSelectionEmpty()) {
-                PlaceholderName_Main.remove_assignment_from_list(assignment_list.getSelectedIndex());
+                SIMPL.remove_assignment_from_list(assignment_list.getSelectedIndex());
                 refresh_list();
             }
         }
@@ -1244,7 +1244,7 @@ class course_frame extends JFrame {
         public void actionPerformed(ActionEvent e) {
             try {
                 course temp = new course(name_field.getText(), department_field.getText(), number_field.getText(), section_field.getText(), grade_field.getText(), start_time_field.getText(), end_time_field.getText(), temp_course_monday, temp_course_tuesday, temp_course_wednesday, temp_course_thursday, temp_course_friday);
-                PlaceholderName_Main.course_list_add(temp);
+                SIMPL.course_list_add(temp);
                 course_panel.refresh_list();
             }
             catch (Exception ex) {
@@ -1318,9 +1318,9 @@ class schedule_frame extends JFrame {
            List<course> courses_per_day = new ArrayList<>();
            schedule += "\n" + days[i] + "\n";
 
-           for (int j = 0; j < PlaceholderName_Main.course_list_size(); j++)
-               if (PlaceholderName_Main.course_list_get_at(j).get_specific_day(i))
-                  courses_per_day.add(PlaceholderName_Main.course_list_get_at(j));
+           for (int j = 0; j < SIMPL.course_list_size(); j++)
+               if (SIMPL.course_list_get_at(j).get_specific_day(i))
+                  courses_per_day.add(SIMPL.course_list_get_at(j));
 
            if (courses_per_day.size() > 0) {
                Collections.sort(courses_per_day);
@@ -1386,10 +1386,10 @@ class assignment_frame extends JFrame {
         grade_percent_field.setFocusLostBehavior(JFormattedTextField.PERSIST);
 
         // Populate the list of possible courses
-        String current_courses[] = new String[PlaceholderName_Main.course_list_size()];
+        String current_courses[] = new String[SIMPL.course_list_size()];
 
-        for (int i = 0; i < PlaceholderName_Main.course_list_size(); i++) {
-            current_courses[i] = PlaceholderName_Main.course_list_get_at(i).get_department_and_number();
+        for (int i = 0; i < SIMPL.course_list_size(); i++) {
+            current_courses[i] = SIMPL.course_list_get_at(i).get_department_and_number();
         }
         course_field = new JComboBox(current_courses);
 
@@ -1534,7 +1534,7 @@ class assignment_frame extends JFrame {
                 if (date_picker.getModel().getValue() != null) {
                     temp.set_due_date(df.format((Date) date_picker.getModel().getValue()).toString());
                 }
-                PlaceholderName_Main.add_assignment_to_list(temp);
+                SIMPL.add_assignment_to_list(temp);
                 assignment_panel.refresh_list();
             }
             catch (Exception ex) {
@@ -1575,37 +1575,37 @@ class edit_course_frame extends course_frame {
         done_button.addActionListener(new done_button_listener());
 
         // populate fields with existing data
-        name_field.setText(PlaceholderName_Main.course_list_get_at(index).get_name());
-        department_field.setText(PlaceholderName_Main.course_list_get_at(index).get_department());
-        number_field.setText(PlaceholderName_Main.course_list_get_at(index).get_number());
-        section_field.setText(PlaceholderName_Main.course_list_get_at(index).get_section());
-        grade_field.setText(PlaceholderName_Main.course_list_get_at(index).get_grade());
-        start_time_field.setText(PlaceholderName_Main.course_list_get_at(index).get_start_time().toString());
-        end_time_field.setText(PlaceholderName_Main.course_list_get_at(index).get_end_time().toString());
+        name_field.setText(SIMPL.course_list_get_at(index).get_name());
+        department_field.setText(SIMPL.course_list_get_at(index).get_department());
+        number_field.setText(SIMPL.course_list_get_at(index).get_number());
+        section_field.setText(SIMPL.course_list_get_at(index).get_section());
+        grade_field.setText(SIMPL.course_list_get_at(index).get_grade());
+        start_time_field.setText(SIMPL.course_list_get_at(index).get_start_time().toString());
+        end_time_field.setText(SIMPL.course_list_get_at(index).get_end_time().toString());
 
-        monday_checkbox.setSelected(PlaceholderName_Main.course_list_get_at(index).get_monday());
-        tuesday_checkbox.setSelected(PlaceholderName_Main.course_list_get_at(index).get_tuesday());
-        wednesday_checkbox.setSelected(PlaceholderName_Main.course_list_get_at(index).get_wednesday());
-        thursday_checkbox.setSelected(PlaceholderName_Main.course_list_get_at(index).get_thursday());
-        friday_checkbox.setSelected(PlaceholderName_Main.course_list_get_at(index).get_friday());
+        monday_checkbox.setSelected(SIMPL.course_list_get_at(index).get_monday());
+        tuesday_checkbox.setSelected(SIMPL.course_list_get_at(index).get_tuesday());
+        wednesday_checkbox.setSelected(SIMPL.course_list_get_at(index).get_wednesday());
+        thursday_checkbox.setSelected(SIMPL.course_list_get_at(index).get_thursday());
+        friday_checkbox.setSelected(SIMPL.course_list_get_at(index).get_friday());
 
         this.setTitle("Editing course");
     }
 
     class done_button_listener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            PlaceholderName_Main.course_list_get_at(index).set_name(name_field.getText());
-            PlaceholderName_Main.course_list_get_at(index).set_department(department_field.getText());
-            PlaceholderName_Main.course_list_get_at(index).set_number(number_field.getText());
-            PlaceholderName_Main.course_list_get_at(index).set_section(section_field.getText());
-            PlaceholderName_Main.course_list_get_at(index).set_grade(grade_field.getText());
-            PlaceholderName_Main.course_list_get_at(index).set_start_time(start_time_field.getText());
-            PlaceholderName_Main.course_list_get_at(index).set_end_time(end_time_field.getText());
-            PlaceholderName_Main.course_list_get_at(index).set_monday(true ? monday_checkbox.isSelected() : false);
-            PlaceholderName_Main.course_list_get_at(index).set_tuesday(true ? tuesday_checkbox.isSelected() : false);
-            PlaceholderName_Main.course_list_get_at(index).set_wednesday(true ? wednesday_checkbox.isSelected() : false);
-            PlaceholderName_Main.course_list_get_at(index).set_thursday(true ? thursday_checkbox.isSelected() : false);
-            PlaceholderName_Main.course_list_get_at(index).set_friday(true ? friday_checkbox.isSelected() : false);
+            SIMPL.course_list_get_at(index).set_name(name_field.getText());
+            SIMPL.course_list_get_at(index).set_department(department_field.getText());
+            SIMPL.course_list_get_at(index).set_number(number_field.getText());
+            SIMPL.course_list_get_at(index).set_section(section_field.getText());
+            SIMPL.course_list_get_at(index).set_grade(grade_field.getText());
+            SIMPL.course_list_get_at(index).set_start_time(start_time_field.getText());
+            SIMPL.course_list_get_at(index).set_end_time(end_time_field.getText());
+            SIMPL.course_list_get_at(index).set_monday(true ? monday_checkbox.isSelected() : false);
+            SIMPL.course_list_get_at(index).set_tuesday(true ? tuesday_checkbox.isSelected() : false);
+            SIMPL.course_list_get_at(index).set_wednesday(true ? wednesday_checkbox.isSelected() : false);
+            SIMPL.course_list_get_at(index).set_thursday(true ? thursday_checkbox.isSelected() : false);
+            SIMPL.course_list_get_at(index).set_friday(true ? friday_checkbox.isSelected() : false);
             course_panel.refresh_list(index);
             setVisible(false);
             dispose();
@@ -1622,26 +1622,26 @@ class edit_assignment_frame extends assignment_frame {
         done_button.addActionListener(new done_button_listener());
 
         // populate fields with existing data
-        name_field.setText(PlaceholderName_Main.get_assignment_at(index).get_name());
-        description_field.setText(PlaceholderName_Main.get_assignment_at(index).get_description());
-        grade_percent_field.setText(PlaceholderName_Main.get_assignment_at(index).get_grade_percent());
-        actual_grade_field.setText(PlaceholderName_Main.get_assignment_at(index).get_actual_grade());
+        name_field.setText(SIMPL.get_assignment_at(index).get_name());
+        description_field.setText(SIMPL.get_assignment_at(index).get_description());
+        grade_percent_field.setText(SIMPL.get_assignment_at(index).get_grade_percent());
+        actual_grade_field.setText(SIMPL.get_assignment_at(index).get_actual_grade());
     }
 
     class done_button_listener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
 
-            PlaceholderName_Main.get_assignment_at(index).set_name(name_field.getText());
-            PlaceholderName_Main.get_assignment_at(index).set_description(description_field.getText());
-            PlaceholderName_Main.get_assignment_at(index).set_course(course_field.getSelectedItem().toString());
-            PlaceholderName_Main.get_assignment_at(index).set_grade_percent(grade_percent_field.getText());
-            PlaceholderName_Main.get_assignment_at(index).set_status(status_field.getSelectedItem().toString());
-            PlaceholderName_Main.get_assignment_at(index).set_actual_grade(actual_grade_field.getText());
-            // PlaceholderName_Main.get_assignment_at(index).set_due_date(date_picker.getModel().getValue().toString());
+            SIMPL.get_assignment_at(index).set_name(name_field.getText());
+            SIMPL.get_assignment_at(index).set_description(description_field.getText());
+            SIMPL.get_assignment_at(index).set_course(course_field.getSelectedItem().toString());
+            SIMPL.get_assignment_at(index).set_grade_percent(grade_percent_field.getText());
+            SIMPL.get_assignment_at(index).set_status(status_field.getSelectedItem().toString());
+            SIMPL.get_assignment_at(index).set_actual_grade(actual_grade_field.getText());
+            // SIMPL.get_assignment_at(index).set_due_date(date_picker.getModel().getValue().toString());
 
             if (date_picker.getModel().getValue() != null) {
-                PlaceholderName_Main.get_assignment_at(index).set_due_date(df.format((Date) date_picker.getModel().getValue()).toString());
+                SIMPL.get_assignment_at(index).set_due_date(df.format((Date) date_picker.getModel().getValue()).toString());
             }
 
             assignment_panel.refresh_list(index);
@@ -1679,7 +1679,7 @@ class add_course_notes_frame extends JFrame {
         // input text
         input_notes.setLineWrap(true);
         input_notes.setWrapStyleWord(true);
-        input_notes.setText(PlaceholderName_Main.course_list_get_at(index).get_notes());
+        input_notes.setText(SIMPL.course_list_get_at(index).get_notes());
         input_notes.setCaretPosition(0);
         JScrollPane notes_scroller = new JScrollPane(input_notes);
         text_pane.add(notes_scroller);
@@ -1697,12 +1697,12 @@ class add_course_notes_frame extends JFrame {
         content_pane.add(text_pane, BorderLayout.CENTER);
         content_pane.add(button_pane, BorderLayout.PAGE_END);
 
-        this.setTitle(PlaceholderName_Main.course_list_get_at(index).get_department_and_number() + " Notes");
+        this.setTitle(SIMPL.course_list_get_at(index).get_department_and_number() + " Notes");
     }
 
     class done_button_listener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            PlaceholderName_Main.course_list_get_at(index).set_notes(input_notes.getText());
+            SIMPL.course_list_get_at(index).set_notes(input_notes.getText());
             course_panel.refresh_list(index);
             setVisible(false);
             dispose();
@@ -1745,7 +1745,7 @@ class add_bill_notes_frame extends JFrame {
         // input text
         input_notes.setLineWrap(true);
         input_notes.setWrapStyleWord(true);
-        input_notes.setText(PlaceholderName_Main.bill_list_get_at(index).get_notes());
+        input_notes.setText(SIMPL.bill_list_get_at(index).get_notes());
         input_notes.setCaretPosition(0);
         JScrollPane notes_scroller = new JScrollPane(input_notes);
         text_pane.add(notes_scroller);
@@ -1763,12 +1763,12 @@ class add_bill_notes_frame extends JFrame {
         content_pane.add(text_pane, BorderLayout.CENTER);
         content_pane.add(button_pane, BorderLayout.PAGE_END);
 
-        this.setTitle(PlaceholderName_Main.bill_list_get_at(index).get_name() + " Notes");
+        this.setTitle(SIMPL.bill_list_get_at(index).get_name() + " Notes");
     }
 
     class done_button_listener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            PlaceholderName_Main.bill_list_get_at(index).set_notes(input_notes.getText());
+            SIMPL.bill_list_get_at(index).set_notes(input_notes.getText());
             bill_panel.refresh_list(index);
             setVisible(false);
             dispose();
@@ -1885,7 +1885,7 @@ class set_bill_reminder_frame extends JFrame {
             }
             int modified_hour = Integer.parseInt(input_hours.getSelectedItem().toString()) + hour_offset;
             String date_time = df.format((Date) date_picker.getModel().getValue()).toString() + " " + Integer.toString(modified_hour) + ":" + (String)input_minutes.getSelectedItem();
-            PlaceholderName_Main.bill_list_get_at(index).set_reminder_date_time(date_time);
+            SIMPL.bill_list_get_at(index).set_reminder_date_time(date_time);
             bill_panel.refresh_list(index);
             setVisible(false);
             dispose();
