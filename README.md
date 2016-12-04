@@ -2,7 +2,7 @@
 
 ## SIMPL
 
-_S_tudent _I_nfo _M_anager _PL_us
+_S_ tudent _I_ nfo _M_ anager _PL_ us
 
 ### Compilation
 
